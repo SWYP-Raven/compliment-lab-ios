@@ -18,7 +18,12 @@ let project = Project(
             ),
             sources: ["ComplimentLab/Sources/**"],
             resources: ["ComplimentLab/Resources/**"],
-            dependencies: []
+            dependencies: [
+                .external(name: "RxSwift"),
+                .external(name: "RxCocoa"),
+                .external(name: "RxRelay"),
+                .external(name: "FirebaseMessaging")
+            ]
         ),
         .target(
             name: "ComplimentLabTests",
