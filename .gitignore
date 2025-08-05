@@ -69,7 +69,14 @@ Derived/
 ### Tuist managed dependencies ###
 Tuist/.build
 
+# Swift Package Manager
+# Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
+Packages/
+Package.pins
+Package.resolved
+
 *.xcconfig
 
 # Ignore GoogleServiceInfo file
 **/GoogleService-Info.plist
+
