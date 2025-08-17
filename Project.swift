@@ -19,7 +19,16 @@ let project = Project(
                         "UIColorName": "",
                         "UIImageName": "",
                     ],
-                    "UIBackgroundModes": ["remote-notification"]
+                    "UIBackgroundModes": ["remote-notification"],
+                    "UIAppFonts": [
+                        "SUITE-Bold.otf",
+                        "SUITE-ExtraBold.otf",
+                        "SUITE-Heavy.otf",
+                        "SUITE-Light.otf",
+                        "SUITE-Medium.otf",
+                        "SUITE-Regular.otf",
+                        "SUITE-SemiBold.otf",
+                    ],
                 ]
             ),
             sources: ["ComplimentLab/Sources/**"],
