@@ -19,8 +19,8 @@ enum DateState {
 }
 
 enum CalendarMode: String, CaseIterable, CustomStringConvertible {
-    case month = "월간"
     case week = "주간"
+    case month = "월간"
     
     var description: String { rawValue }
 }
