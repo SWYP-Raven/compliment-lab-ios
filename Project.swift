@@ -2,6 +2,10 @@ import ProjectDescription
 
 let project = Project(
     name: "ComplimentLab",
+    options: .options(
+        defaultKnownRegions: ["en", "ko"],
+        developmentRegion: "ko"
+    ),
     settings: .settings(
         base: [
             "CODE_SIGN_ENTITLEMENTS": "ComplimentLab/Config/ComplimentLab.entitlements"
