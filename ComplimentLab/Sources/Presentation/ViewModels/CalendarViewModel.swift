@@ -7,12 +7,27 @@
 
 import Foundation
 
+/// - past: 오늘 이전 날짜
+/// - today: 오늘 날짜
+/// - future: 오늘 이후 날짜
+/// - outsideMonth: 해당 월에 속하지 않음
+enum DateState {
+    case past
+    case today
+    case future
+    case outsideMonth
+}
+
 @MainActor
 final class CalendarViewModel: ObservableObject {
     let calendar = Calendar.current
     @Published var selectDate: Date = Date()
     @Published var monthDates: [CalendarDate] = []
     @Published var weekDates: [CalendarDate] = [] // 선택한 주에 들어있는 날짜들
+    @Published var selectedYear: Int = Calendar.current.component(.year, from: .now)
+    @Published var selectedMonth: Int = Calendar.current.component(.month, from: .now)
+    @Published var shouldShowMonthPicker = false
+    
     @Published var month: Date = Date() {
         didSet {
             getMonthDate()
@@ -24,12 +39,14 @@ final class CalendarViewModel: ObservableObject {
         }
     } // 선택한 주
     
-    // 해당 월이 며칠까지 있는지 (ex: 28, 29, 30, 31)
+    @Published var isDragging = false // 달력 스와이프 시 셀 눌림 방지
+    
+    // 해당 달이 며칠까지 있는지 (ex: 28, 29, 30, 31)
     func numberOfDays(in date: Date) -> Int {
         return calendar.range(of: .day, in: .month, for: date)?.count ?? 0
     }
     
-    // 선택된 월에 표시할 날짜 목록
+    // 선택된 달에 표시할 날짜 목록
     // (이전 달 말 일부 + 이번 달 전체 + 다음 달 초 일부 포함)
     func getMonthDate() {
         let components = calendar.dateComponents([.year, .month], from: month)
@@ -71,5 +88,64 @@ final class CalendarViewModel: ObservableObject {
         formatter.locale = Locale(identifier: "ko_KR")
         
         return formatter.string(from: date)
+    }
+    
+    // 달 변경 (주간 달력 모드에서 달이 바뀌면 해당 달의 1일로 주를 초기화)
+    func changeMonth(by value: Int) {
+        if let newMonth = calendar.date(byAdding: .month, value: value, to: month) {
+            self.month = newMonth
+            
+            var components = calendar.dateComponents([.year, .month], from: newMonth)
+            components.day = 1
+            
+            if let firstWeekOfMonth = calendar.date(from: components) {
+                self.week = firstWeekOfMonth
+            }
+        }
+    }
+    
+    func changeMonth(year: Int, month: Int) {
+        let components = DateComponents(year: year, month: month)
+        if let newMonth = calendar.date(from: components) {
+            self.month = newMonth
+            self.selectedYear = year
+            self.selectedMonth = month
+            
+            var components = calendar.dateComponents([.year, .month], from: newMonth)
+            components.day = 1
+            
+            if let firstWeekOfMonth = calendar.date(from: components) {
+                self.week = firstWeekOfMonth
+            }
+        }
+    }
+    
+    // 주 변경 (다른 달로 넘어가면 해당 달로 월 갱신)
+    func changeWeek(by value: Int) {
+        if let newWeek = calendar.date(byAdding: .weekOfYear, value: value, to: week) {
+            self.week = newWeek
+            
+            let newMonthComponent = calendar.dateComponents([.month], from: newWeek)
+            let oldMonthComponent = calendar.dateComponents([.month], from: month)
+            
+            if newMonthComponent.month != oldMonthComponent.month {
+                self.month = newWeek
+            }
+        }
+    }
+    
+    // 날짜 상태 판별
+    func state(for date: Date, in month: Date) -> DateState {
+        let today = calendar.startOfDay(for: Date())
+        
+        guard calendar.isDate(date, equalTo: month, toGranularity: .month) else {
+            return .outsideMonth
+        }
+        
+        if calendar.isDateInToday(date) {
+            return .today
+        }
+        
+        return date < today ? .past : .future
     }
 }
