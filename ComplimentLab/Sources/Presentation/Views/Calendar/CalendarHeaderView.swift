@@ -55,6 +55,38 @@ struct WeekdayHeaderView: View {
     }
 }
 
+// TODO: - 유저 닉네임 추가
+struct NavigateToFriendView: View {
+    var body: some View {
+        HStack {
+            Image("Character Pink half")
+            
+            Spacer()
+            
+            VStack(alignment: .leading) {
+                Text("Username님,")
+                    .font(.suite(.bold, size: 17))
+                    .foregroundColor(Color.blue4)
+                
+                Text("나만의 칭구를 만나보세요!")
+                    .font(.suite(.medium, size: 14))
+                    .foregroundColor(Color.gray5)
+            }
+            
+            Spacer()
+            
+            Image("Arrow right Default")
+                .renderingMode(.template)
+                .foregroundColor(Color.blue4)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.leading, 22)
+        .padding(.trailing, 15)
+        .background(Color.blue1)
+        .clipShape(RoundedRectangle(cornerRadius: 15))
+    }
+}
+
 
 #Preview {
     CalendarHeaderView(calendarViewModel: CalendarViewModel())

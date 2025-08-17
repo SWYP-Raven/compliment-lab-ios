@@ -15,8 +15,9 @@ struct CalendarView: View {
         ZStack {
             VStack(alignment: .leading) {
                 CalendarHeaderView(calendarViewModel: calendarViewModel)
-                    .padding(.bottom, 41)
-                
+                    .padding(.bottom, 10)
+                NavigateToFriendView()
+                    .padding(.bottom, 8)
                 WeekdayHeaderView()
                 
                 if calendarViewModel.mode == .month {
