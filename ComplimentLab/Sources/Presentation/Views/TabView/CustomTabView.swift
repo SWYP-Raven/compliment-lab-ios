@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CustomTabView: View {
+    @StateObject var calendarViewModel = CalendarViewModel()
     @State private var selection = 0
     
     init() {
@@ -23,34 +24,48 @@ struct CustomTabView: View {
     }
     
     var body: some View {
-        TabView(selection: $selection) {
-            CalendarView()
-                .tabItem {
-                    selection == 0 ? Image("Home Pressed") : Image("Home Default")
-                    Text("일력")
-                }
-                .tag(0)
+        ZStack {
+            TabView(selection: $selection) {
+                CalendarView(calendarViewModel: calendarViewModel)
+                    .tabItem {
+                        selection == 0 ? Image("Home Pressed") : Image("Home Default")
+                        Text("일력")
+                    }
+                    .tag(0)
+                
+                Color.clear
+                    .tabItem {
+                        selection == 1 ? Image("Chat Pressed") : Image("Chat Default")
+                        Text("칭구")
+                    }
+                    .tag(1)
+                
+                Color.clear
+                    .tabItem {
+                        selection == 2 ? Image("Archive Pressed") : Image("Archive Default")
+                        Text("기록")
+                    }
+                    .tag(2)
+                
+                Color.clear
+                    .tabItem {
+                        selection == 3 ? Image("My Pressed") : Image("My Default")
+                        Text("마이")
+                    }
+                    .tag(3)
+            }
             
-            Color.clear
-                .tabItem {
-                    selection == 1 ? Image("Chat Pressed") : Image("Chat Default")
-                    Text("칭구")
-                }
-                .tag(1)
-            
-            Color.clear
-                .tabItem {
-                    selection == 2 ? Image("Archive Pressed") : Image("Archive Default")
-                    Text("기록")
-                }
-                .tag(2)
-            
-            Color.clear
-                .tabItem {
-                    selection == 3 ? Image("My Pressed") : Image("My Default")
-                    Text("마이")
-                }
-                .tag(3)
+            if calendarViewModel.shouldShowMonthPicker {
+                Color.backgroundGray
+                    .edgesIgnoringSafeArea(.all)
+                    .onTapGesture {
+                        calendarViewModel.shouldShowMonthPicker = false
+                    }
+                
+                YearMonthPickerView(calendarViewModel: calendarViewModel, pickerYear: calendarViewModel.selectedYear)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .padding(35)
+            }
         }
     }
 }

@@ -8,81 +8,66 @@
 import SwiftUI
 
 struct CalendarView: View {
-    @StateObject var calendarViewModel = CalendarViewModel()
+    @ObservedObject var calendarViewModel: CalendarViewModel
     @State var offset: CGSize = CGSize()
     
     var body: some View {
-        ZStack {
-            VStack(alignment: .leading) {
-                CalendarHeaderView(calendarViewModel: calendarViewModel)
-                    .padding(.bottom, 10)
-                NavigateToFriendView()
-                    .padding(.bottom, 8)
-                WeekdayHeaderView()
-                
-                if calendarViewModel.mode == .month {
-                    CalendarGridView(calendarViewModel: calendarViewModel, dates: calendarViewModel.monthDates)
-                    .gesture(
-                        DragGesture()
-                            .onChanged { gesture in
-                                if abs(gesture.translation.width) > 10 { // 일정 수준 이상 드래그 되었을 때만 처리
-                                    calendarViewModel.isDragging = true
-                                }
-                                self.offset = gesture.translation
-                            }
-                            .onEnded { gesture in
-                                if gesture.translation.width < -100 {
-                                    calendarViewModel.changeMonth(by: 1)
-                                } else if gesture.translation.width > 100 {
-                                    calendarViewModel.changeMonth(by: -1)
-                                }
-                                self.offset = CGSize()
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    self.calendarViewModel.isDragging = false
-                                }
-                            }
-                    )
-                } else {
-                    CalendarGridView(calendarViewModel: calendarViewModel, dates: calendarViewModel.weekDates)
-                    .gesture(
-                        DragGesture()
-                            .onChanged { gesture in
-                                if abs(gesture.translation.width) > 10 { // 일정 수준 이상 드래그 되었을 때만 처리
-                                    calendarViewModel.isDragging = true
-                                }
-                                self.offset = gesture.translation
-                            }
-                            .onEnded { gesture in
-                                if gesture.translation.width < -100 {
-                                    calendarViewModel.changeWeek(by: 1)
-                                } else if gesture.translation.width > 100 {
-                                    calendarViewModel.changeWeek(by: -1)
-                                }
-                                self.offset = CGSize()
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    self.calendarViewModel.isDragging = false
-                                }
-                            }
-                    )
-                }
-                
-                Spacer()
-            }
-            .padding(.horizontal, 20)
+        VStack(alignment: .leading) {
+            CalendarHeaderView(calendarViewModel: calendarViewModel)
+                .padding(.bottom, 10)
+            NavigateToFriendView()
+                .padding(.bottom, 8)
+            WeekdayHeaderView()
             
-            if calendarViewModel.shouldShowMonthPicker {
-                Color.black
-                    .opacity(0.5)
-                    .edgesIgnoringSafeArea(.all)
-                    .onTapGesture {
-                        calendarViewModel.shouldShowMonthPicker = false
-                    }
-                
-                YearMonthPickerView(calendarViewModel: calendarViewModel, pickerYear: calendarViewModel.selectedYear)
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
-                    .padding(35)
+            if calendarViewModel.mode == .month {
+                CalendarGridView(calendarViewModel: calendarViewModel, dates: calendarViewModel.monthDates)
+                .gesture(
+                    DragGesture()
+                        .onChanged { gesture in
+                            if abs(gesture.translation.width) > 10 { // 일정 수준 이상 드래그 되었을 때만 처리
+                                calendarViewModel.isDragging = true
+                            }
+                            self.offset = gesture.translation
+                        }
+                        .onEnded { gesture in
+                            if gesture.translation.width < -100 {
+                                calendarViewModel.changeMonth(by: 1)
+                            } else if gesture.translation.width > 100 {
+                                calendarViewModel.changeMonth(by: -1)
+                            }
+                            self.offset = CGSize()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                self.calendarViewModel.isDragging = false
+                            }
+                        }
+                )
+            } else {
+                CalendarGridView(calendarViewModel: calendarViewModel, dates: calendarViewModel.weekDates)
+                .gesture(
+                    DragGesture()
+                        .onChanged { gesture in
+                            if abs(gesture.translation.width) > 10 { // 일정 수준 이상 드래그 되었을 때만 처리
+                                calendarViewModel.isDragging = true
+                            }
+                            self.offset = gesture.translation
+                        }
+                        .onEnded { gesture in
+                            if gesture.translation.width < -100 {
+                                calendarViewModel.changeWeek(by: 1)
+                            } else if gesture.translation.width > 100 {
+                                calendarViewModel.changeWeek(by: -1)
+                            }
+                            self.offset = CGSize()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                self.calendarViewModel.isDragging = false
+                            }
+                        }
+                )
             }
+            
+            Spacer()
         }
+        .padding(.horizontal, 20)
     }
 }
 
@@ -178,5 +163,5 @@ struct DateCellView: View {
 }
 
 #Preview {
-    CalendarView()
+    CalendarView(calendarViewModel: CalendarViewModel())
 }
