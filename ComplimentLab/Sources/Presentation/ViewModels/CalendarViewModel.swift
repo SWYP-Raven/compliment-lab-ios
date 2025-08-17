@@ -18,6 +18,13 @@ enum DateState {
     case outsideMonth
 }
 
+enum CalendarMode: String, CaseIterable, CustomStringConvertible {
+    case month = "월간"
+    case week = "주간"
+    
+    var description: String { rawValue }
+}
+
 @MainActor
 final class CalendarViewModel: ObservableObject {
     let calendar = Calendar.current
@@ -38,6 +45,17 @@ final class CalendarViewModel: ObservableObject {
             getWeekDate()
         }
     } // 선택한 주
+    
+    @Published var mode: CalendarMode = {
+        if let saved = UserDefaults.standard.string(forKey: "mode"), let savedMode = CalendarMode(rawValue: saved) {
+            return savedMode
+        }
+        return .month
+    }() {
+        didSet {
+            UserDefaults.standard.set(mode.rawValue, forKey: "mode")
+        }
+    }
     
     @Published var isDragging = false // 달력 스와이프 시 셀 눌림 방지
     
