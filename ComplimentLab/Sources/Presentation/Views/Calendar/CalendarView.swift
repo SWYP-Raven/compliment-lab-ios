@@ -68,6 +68,19 @@ struct CalendarView: View {
                 Spacer()
             }
             .padding(.horizontal, 20)
+            
+            if calendarViewModel.shouldShowMonthPicker {
+                Color.black
+                    .opacity(0.5)
+                    .edgesIgnoringSafeArea(.all)
+                    .onTapGesture {
+                        calendarViewModel.shouldShowMonthPicker = false
+                    }
+                
+                YearMonthPickerView(calendarViewModel: calendarViewModel, pickerYear: calendarViewModel.selectedYear)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .padding(35)
+            }
         }
     }
 }
