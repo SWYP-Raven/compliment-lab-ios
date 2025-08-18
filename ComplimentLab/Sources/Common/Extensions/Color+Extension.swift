@@ -18,6 +18,7 @@ extension Color {
     static let gray7 = Color("gray7")
     static let gray8 = Color("gray8")
     static let gray9 = Color("gray9")
+    static let gray10 = Color("gray10")
     static let backgroundGray = Color("backgroundGray")
     
     static let pink1 = Color("pink1")
