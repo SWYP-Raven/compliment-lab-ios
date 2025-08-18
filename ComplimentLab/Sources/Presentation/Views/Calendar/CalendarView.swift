@@ -107,6 +107,7 @@ struct DateCellView: View {
                 if !calendarViewModel.isDragging {
                     if Calendar.current.isDate(calendarDate.date, equalTo: calendarViewModel.month, toGranularity: .month) {
                         calendarViewModel.selectDate = calendarDate.date
+                        calendarViewModel.isButtonTapped = true
                     } else {
                         if calendarDate.date < calendarViewModel.month {
                             calendarViewModel.changeMonth(by: -1)

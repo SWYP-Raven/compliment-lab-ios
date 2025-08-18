@@ -58,6 +58,7 @@ final class CalendarViewModel: ObservableObject {
     }
     
     @Published var isDragging = false // 달력 스와이프 시 셀 눌림 방지
+    @Published var isButtonTapped = false
     
     // 해당 달이 며칠까지 있는지 (ex: 28, 29, 30, 31)
     func numberOfDays(in date: Date) -> Int {
