@@ -7,17 +7,6 @@
 
 import SwiftUI
 
-struct ExDivider: View {
-    let color: Color = .white
-    let width: CGFloat = 1
-    var body: some View {
-        Rectangle()
-            .fill(color)
-            .frame(height: width)
-            .edgesIgnoringSafeArea(.horizontal)
-    }
-}
-
 struct TodayComplimentView: View {
     var body: some View {
         ZStack {
@@ -61,15 +50,42 @@ struct TodayComplimentView: View {
                         ZStack {
                             Image("Flower Default Default")
                             
-                            // TODO: - If 필사 완료했을때?
+                            // TODO: - 아카이브
                             Image("Flower Pressed")
                         }
                     }
                 
-                    Button {
+                    let vstackView = VStack(spacing: 26) {
+                        FlowerView()
                         
-                    } label: {
-                        Image("Send Default")
+                        VStack(spacing: 28) {
+                            ComplimentTextView()
+                            Image("logo home")
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 17)
+                    .padding(.vertical, 25)
+                    .background(Color.pink2)
+                    .padding(.bottom, 15)
+                    .overlay(
+                        Image("Character Pink Stiker L")
+                            .padding(.top, 25)
+                            .padding(.leading, 17),
+                        alignment: .topLeading
+                    )
+                    
+                    if let swiftUIImage = snapshotCardImage(vstackView) {
+                        let photo = Photo(image: swiftUIImage, caption: "오늘의 칭찬")
+                        ShareLink(
+                            item: photo,
+                            preview: SharePreview(
+                                photo.caption,
+                                image: photo.image
+                            )
+                        ) {
+                            Image("Send Default")
+                        }
                     }
                 }
                 
@@ -78,6 +94,24 @@ struct TodayComplimentView: View {
             .padding(.horizontal, 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
+    }
+    
+    @MainActor
+    func snapshotCardImage<Content: View>(
+        _ content: Content,
+        size: CGSize = .init(width: 335, height: 498),
+        scale: CGFloat = 3.0
+    ) -> Image? {
+        let card = content
+            .frame(width: size.width, height: size.height)
+
+        let r = ImageRenderer(content: card)
+        r.proposedSize = .init(width: size.width, height: size.height)
+        r.scale = scale
+        r.isOpaque = false
+
+        guard let ui = r.uiImage else { return nil }
+        return Image(uiImage: ui)
     }
 }
 
@@ -123,6 +157,26 @@ struct ComplimentTextView: View {
     private var lines: [String] {
         message.components(separatedBy: "\n")
     }
+}
+
+struct ExDivider: View {
+    let color: Color = .white
+    let width: CGFloat = 1
+    var body: some View {
+        Rectangle()
+            .fill(color)
+            .frame(height: width)
+            .edgesIgnoringSafeArea(.horizontal)
+    }
+}
+
+struct Photo: Transferable {
+    static var transferRepresentation: some TransferRepresentation {
+        ProxyRepresentation(exporting: \.image)
+    }
+    
+    public var image: Image
+    public var caption: String
 }
 
 #Preview {
