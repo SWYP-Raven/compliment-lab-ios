@@ -13,10 +13,12 @@ struct CustomTextField: UIViewRepresentable {
     @Binding var textCount: Int
     let sentence: String
     let tagIndex: Int
+    var onReturn: (() -> Void)? = nil
     
-    func makeUIView(context: Context) -> UITextField {
-        let textField = UITextField()
+    func makeUIView(context: Context) -> MyTextField {
+        let textField = MyTextField()
         textField.delegate = context.coordinator
+        textField.backspaceDelegate = context.coordinator
 
         // 커서만 보이게 설정
         textField.font = UIFont(name: "SUITE-SemiBold", size: 15)
@@ -29,6 +31,7 @@ struct CustomTextField: UIViewRepresentable {
         textField.spellCheckingType = .no
         
         textField.tag = tagIndex
+        TextFieldRegistry.set(textField, tag: tagIndex)
         
         textField.borderStyle = .none
         textField.contentVerticalAlignment = .top
@@ -42,7 +45,7 @@ struct CustomTextField: UIViewRepresentable {
         return textField
     }
     
-    func updateUIView(_ uiView: UITextField, context: Context) {
+    func updateUIView(_ uiView: MyTextField, context: Context) {
         uiView.text = text
     }
     
@@ -50,7 +53,7 @@ struct CustomTextField: UIViewRepresentable {
         Coordinator(parent: self, text: $text, textCount: $textCount, sentence: sentence, tagIndex: tagIndex)
     }
     
-    class Coordinator: NSObject, UITextFieldDelegate {
+    class Coordinator: NSObject, UITextFieldDelegate, BackspaceDelegate {
         @Binding var text: String
         @Binding var textCount: Int
         let parent: CustomTextField
@@ -122,5 +125,42 @@ struct CustomTextField: UIViewRepresentable {
             
             return true
         }
+        
+        // textField가 비어있을 때 백스페이스를 누르는 경우 처리
+        func didPressBackspace(_ textField: MyTextField) {
+            guard (textField.text ?? "").isEmpty else { return }
+            
+            // 이전 라인으로 돌아가게
+            let prevTag = textField.tag - 1
+            if let prev = TextFieldRegistry.get(prevTag) {
+                DispatchQueue.main.async {
+                    prev.becomeFirstResponder()
+                }
+            }
+        }
     }
+}
+
+protocol BackspaceDelegate: AnyObject {
+    func didPressBackspace(_ textField: MyTextField)
+}
+
+class MyTextField: UITextField {
+    weak var backspaceDelegate: BackspaceDelegate?
+
+    override func deleteBackward() {
+        super.deleteBackward()
+        backspaceDelegate?.didPressBackspace(self)
+    }
+}
+
+class TextFieldRegistry {
+    static var map: [Int: WeakRef<UITextField>] = [:]
+    static func set(_ tf: UITextField, tag: Int) { map[tag] = WeakRef(tf) }
+    static func get(_ tag: Int) -> UITextField? { map[tag]?.value }
+}
+
+class WeakRef<T: AnyObject> {
+    weak var value: T?
+    init(_ v: T) { self.value = v }
 }
