@@ -8,48 +8,39 @@
 import SwiftUI
 
 struct HandCopyingView: View {
-    @State private var text = ""
-    private let placeholder = "오늘도 한 발자국 나아갔네요."
+    @StateObject var viewModel = HandCopyingViewModel()
     
     var body: some View {
-        ZStack(alignment: .leading) {
-            let p = placeholder.precomposedStringWithCanonicalMapping
-            let t = text.precomposedStringWithCanonicalMapping
-
-            let limited = String(t.prefix(p.count))
-
-            let n = limited.count
-            let matchCount: Int = {
-                var c = 0
-                for (a, b) in zip(limited, p.prefix(n)) {
-                    if a == b { c += 1 } else { break }
+        ZStack {
+            Color.pink1.ignoresSafeArea()
+            
+            VStack {
+                Text("2025년")
+                    .font(.suite(.bold, size: 17))
+                    .foregroundStyle(Color.gray8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 18)
+                    .padding(.bottom, 15)
+                
+                VStack(spacing: 26) {
+                    Image("Character Pink Stiker L")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    TracingTextView(viewModel: viewModel)
+                    Image("logo home")
                 }
-                return c
-            }()
-
-            let matchedPrefix   = String(limited.prefix(matchCount))
-            let mismatchedInput = String(limited.dropFirst(matchCount))
-            let remainingGhost  = String(p.dropFirst(n))
-
-            (
-                Text(matchedPrefix).foregroundStyle(.primary) +
-                Text(mismatchedInput).foregroundStyle(.secondary) +
-                Text(remainingGhost).foregroundStyle(.secondary)
-            )
-            .allowsHitTesting(false)
-
-            TextField("", text: $text)
-                .foregroundStyle(.clear)
-                .tint(.blue)
-                .textInputAutocapitalization(.never)
-                .disableAutocorrection(true)
-                .onChange(of: text) { _, newValue in
-                    if newValue.count > p.count {
-                        text = String(newValue.prefix(p.count))
-                    }
-                }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 17)
+                .padding(.vertical, 25)
+                .background(Color.pink2)
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .padding(.bottom, 15)
+            }
+            .padding(.horizontal, 20)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
-        .padding()
+        .onTapGesture {
+            UIApplication.shared.endEditing(true)
+        }
     }
 }
 
