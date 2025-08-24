@@ -9,6 +9,11 @@ import SwiftUI
 
 struct HandCopyingView: View {
     @StateObject var viewModel = HandCopyingViewModel()
+    private let sentence: String
+    
+    init(sentence: String) {
+        self.sentence = sentence
+    }
     
     var body: some View {
         ZStack {
@@ -25,7 +30,7 @@ struct HandCopyingView: View {
                 VStack(spacing: 26) {
                     Image("Character Pink Stiker L")
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    TracingTextView(viewModel: viewModel)
+                    TracingTextView(viewModel: viewModel, sentence: sentence)
                     Image("logo home")
                 }
                 .frame(maxWidth: .infinity)
@@ -45,5 +50,5 @@ struct HandCopyingView: View {
 }
 
 #Preview {
-    HandCopyingView()
+    HandCopyingView(sentence: "")
 }

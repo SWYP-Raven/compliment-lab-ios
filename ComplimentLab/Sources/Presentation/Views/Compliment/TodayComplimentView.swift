@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct TodayComplimentView: View {
+    @State private var flowerPressed: Bool = false
+    private let sentence: String = "오늘도 한 발자국 나아갔네요.\n그 걸음이 모여 더 큰 변화를 만들 거예요!"
+    
     var body: some View {
         ZStack {
             Color.pink1.ignoresSafeArea()
@@ -24,7 +27,13 @@ struct TodayComplimentView: View {
                     FlowerView()
                     
                     VStack(spacing: 28) {
-                        ComplimentTextView()
+                        NavigationLink {
+                            HandCopyingView(sentence: sentence)
+                        } label: {
+                            ComplimentTextView(sentence: sentence)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        
                         Image("logo home")
                     }
                 }
@@ -45,13 +54,15 @@ struct TodayComplimentView: View {
                     Spacer()
                     
                     Button {
-                        
+                        flowerPressed.toggle()
                     } label: {
                         ZStack {
                             Image("Flower Default Default")
                             
                             // TODO: - 아카이브
-                            Image("Flower Pressed")
+                            if flowerPressed {
+                                Image("Flower Pressed")
+                            }
                         }
                     }
                 
@@ -59,7 +70,7 @@ struct TodayComplimentView: View {
                         FlowerView()
                         
                         VStack(spacing: 28) {
-                            ComplimentTextView()
+                            ComplimentTextView(sentence: sentence)
                             Image("logo home")
                         }
                     }
@@ -139,34 +150,28 @@ struct FlowerView: View {
 }
 
 struct ComplimentTextView: View {
-    let message: String = "오늘도 한 발자국 나아갔네요.\n그 걸음이 모여 더 큰 변화를 만들 거예요!"
+    private let sentence: String
+    private var lines: [String] {
+        sentence.components(separatedBy: "\n")
+    }
+    
+    init(sentence: String) {
+        self.sentence = sentence
+    }
     
     var body: some View {
         VStack(spacing: 12) {
             ExDivider()
             ForEach(lines, id: \.self) { line in
                 Text(line)
+                    .font(.suite(.semiBold, size: 15))
+                
                 if line != lines.last {
                     ExDivider()
                 }
             }
             ExDivider()
         }
-    }
-    
-    private var lines: [String] {
-        message.components(separatedBy: "\n")
-    }
-}
-
-struct ExDivider: View {
-    let color: Color = .white
-    let width: CGFloat = 1
-    var body: some View {
-        Rectangle()
-            .fill(color)
-            .frame(height: width)
-            .edgesIgnoringSafeArea(.horizontal)
     }
 }
 

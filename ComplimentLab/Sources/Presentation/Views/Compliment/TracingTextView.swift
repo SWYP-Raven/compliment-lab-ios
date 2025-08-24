@@ -11,12 +11,12 @@ struct TracingTextView: View {
     @ObservedObject var viewModel: HandCopyingViewModel
     @State private var texts: [String]
     @State private var textCounts: [Int]
+    private let sentence: String
     private let lines: [String]
-    
-    private let sentence = "오늘도 한 발자국 나아갔네와.\n그 걸음이 모여서 더 큰 변화를 이룰 거에와!".precomposedStringWithCanonicalMapping
 
-    init(viewModel: HandCopyingViewModel) {
+    init(viewModel: HandCopyingViewModel, sentence: String) {
         self.viewModel = viewModel
+        self.sentence = sentence.precomposedStringWithCanonicalMapping
         self.lines = sentence.components(separatedBy: "\n")
         _texts = State(initialValue: Array(repeating: "", count: lines.count))
         _textCounts = State(initialValue: Array(repeating: 0, count: lines.count))
@@ -138,5 +138,5 @@ struct TracingTextView: View {
 }
 
 #Preview {
-    TracingTextView(viewModel: HandCopyingViewModel())
+    TracingTextView(viewModel: HandCopyingViewModel(), sentence: "")
 }
