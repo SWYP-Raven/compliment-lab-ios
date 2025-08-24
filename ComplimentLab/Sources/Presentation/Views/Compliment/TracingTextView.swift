@@ -48,6 +48,9 @@ struct TracingTextView: View {
                         textCount: $textCounts[i],
                         sentence: line,
                         tagIndex: i,
+                        onReturn: {
+                            validateHandCopying()
+                        }
                     )
                     .frame(width: textWidth)
                 }
@@ -58,6 +61,20 @@ struct TracingTextView: View {
             }
             
             ExDivider()
+        }
+    }
+    
+    private func validateHandCopying() {
+        let fullInput = texts.joined(separator: "\n").precomposedStringWithCanonicalMapping
+        
+        if fullInput.count == sentence.count {
+            if fullInput == sentence {
+                print("동일")
+            } else {
+                print("조금 다름")
+            }
+        } else {
+            print("미입력")
         }
     }
     

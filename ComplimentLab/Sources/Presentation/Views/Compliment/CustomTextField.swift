@@ -126,6 +126,12 @@ struct CustomTextField: UIViewRepresentable {
             return true
         }
         
+        // 키보드 완료 버튼 클릭 시
+        func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+            parent.onReturn?()
+            return true
+        }
+        
         // textField가 비어있을 때 백스페이스를 누르는 경우 처리
         func didPressBackspace(_ textField: MyTextField) {
             guard (textField.text ?? "").isEmpty else { return }
