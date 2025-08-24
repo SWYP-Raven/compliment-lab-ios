@@ -4,7 +4,7 @@ import SwiftUI
 struct ComplimentLabApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            OnboardingView()
         }
     }
 }
