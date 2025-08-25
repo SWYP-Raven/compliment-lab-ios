@@ -2,6 +2,10 @@ import ProjectDescription
 
 let project = Project(
     name: "ComplimentLab",
+    options: .options(
+        defaultKnownRegions: ["en", "ko"],
+        developmentRegion: "ko"
+    ),
     settings: .settings(
         base: [
             "CODE_SIGN_ENTITLEMENTS": "ComplimentLab/Config/ComplimentLab.entitlements"
@@ -19,7 +23,16 @@ let project = Project(
                         "UIColorName": "",
                         "UIImageName": "",
                     ],
-                    "UIBackgroundModes": ["remote-notification"]
+                    "UIBackgroundModes": ["remote-notification"],
+                    "UIAppFonts": [
+                        "SUITE-Bold.otf",
+                        "SUITE-ExtraBold.otf",
+                        "SUITE-Heavy.otf",
+                        "SUITE-Light.otf",
+                        "SUITE-Medium.otf",
+                        "SUITE-Regular.otf",
+                        "SUITE-SemiBold.otf",
+                    ],
                 ]
             ),
             sources: ["ComplimentLab/Sources/**"],
