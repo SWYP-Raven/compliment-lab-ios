@@ -18,6 +18,9 @@ struct HandCopyingView: View {
     var body: some View {
         ZStack {
             Color.pink1.ignoresSafeArea()
+                .onTapGesture {
+                    UIApplication.shared.endEditing(true)
+                }
             
             VStack {
                 Text("2025년")
@@ -42,9 +45,6 @@ struct HandCopyingView: View {
             }
             .padding(.horizontal, 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        }
-        .onTapGesture {
-            UIApplication.shared.endEditing(true)
         }
     }
 }
