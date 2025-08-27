@@ -82,11 +82,40 @@ struct CustomTextField: UIViewRepresentable {
         // 해당 라인의 문장 길이 초과 시 다음 라인으로 이동
         @objc func textFieldDidChange(_ textField: UITextField) {
             let targetLen = sentence.precomposedStringWithCanonicalMapping.count
-            let currentText = textField.text ?? ""
+            let currentText = (textField.text ?? "").precomposedStringWithCanonicalMapping
             
-            if currentText.count >= targetLen {
-                textField.text = String(currentText.prefix(targetLen))
+            let caretOffsetNow: Int = {
+                guard let sel = textField.selectedTextRange else { return currentText.count }
+                return textField.offset(from: textField.beginningOfDocument, to: sel.start)
+            }()
+            
+            // 초과 입력이면: 원래 텍스트로 되돌리고 커서도 복원
+            if currentText.count > targetLen {
+                let prev = text.precomposedStringWithCanonicalMapping
                 
+                let delta = max(0, currentText.count - prev.count)
+                
+                // 되돌린 뒤 커서가 있어야 할 위치(이전 위치로 되돌리기)
+                let desiredOffset = min(max(0, caretOffsetNow - delta), prev.count)
+                
+                // 텍스트 되돌리기
+                textField.text = prev
+                
+                // 커서 복원
+                if let start = textField.position(from: textField.beginningOfDocument, offset: desiredOffset),
+                   let range = textField.textRange(from: start, to: start) {
+                    textField.selectedTextRange = range
+                }
+                
+                return
+            }
+            
+            let isCursorAtEnd: Bool = {
+                guard let sel = textField.selectedTextRange else { return true }
+                return sel.end == textField.endOfDocument
+            }()
+            
+            if currentText.count == targetLen, isCursorAtEnd {
                 DispatchQueue.main.async {
                     let nextTag = textField.tag + 1
                     if let next = textField.window?.viewWithTag(nextTag) as? UITextField {
