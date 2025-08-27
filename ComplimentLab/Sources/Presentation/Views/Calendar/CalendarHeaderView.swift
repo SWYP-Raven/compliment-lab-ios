@@ -30,9 +30,9 @@ struct CalendarHeaderView: View {
             CustomSegmentedControl(items: CalendarMode.allCases, selection: $calendarViewModel.mode)
                 .onChange(of: calendarViewModel.mode) { _, newValue in
                     if newValue == .month {
-                        calendarViewModel.getMonthDate()
+                        calendarViewModel.monthDates = calendarViewModel.getMonthDate(for: calendarViewModel.month)
                     } else {
-                        calendarViewModel.getWeekDate()
+                        calendarViewModel.weekDates = calendarViewModel.getWeekDate(for: calendarViewModel.week)
                     }
                 }
         }

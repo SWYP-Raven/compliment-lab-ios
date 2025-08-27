@@ -37,12 +37,22 @@ final class CalendarViewModel: ObservableObject {
     
     @Published var month: Date = Date() {
         didSet {
-            getMonthDate()
+            monthDates = getMonthDate(for: month)
+            
+            let prev = calendar.date(byAdding: .month, value: -1, to: month) ?? month
+            let next = calendar.date(byAdding: .month, value:  1, to: month) ?? month
+            prevMonthDates = getMonthDate(for: prev)
+            nextMonthDates = getMonthDate(for: next)
         }
     }
     @Published var week: Date = Date() {
         didSet {
-            getWeekDate()
+            weekDates = getWeekDate(for: week)
+            
+            let prev = calendar.date(byAdding: .weekOfYear, value: -1, to: week) ?? week
+            let next = calendar.date(byAdding: .weekOfYear, value:  1, to: week) ?? week
+            prevMonthDates = getWeekDate(for: prev)
+            nextMonthDates = getWeekDate(for: next)
         }
     } // 선택한 주
     
@@ -60,6 +70,15 @@ final class CalendarViewModel: ObservableObject {
     @Published var isDragging = false // 달력 스와이프 시 셀 눌림 방지
     @Published var isButtonTapped = false
     
+    // 이전 & 다음달 미리 그려둠
+    var prevMonthDates: [CalendarDate] = []
+    var nextMonthDates: [CalendarDate] = []
+    
+    // 이전 & 다음주 미리 그려둠
+    var prevWeekDates: [CalendarDate] = []
+    var nextWeekDates: [CalendarDate] = []
+
+    
     // 해당 달이 며칠까지 있는지 (ex: 28, 29, 30, 31)
     func numberOfDays(in date: Date) -> Int {
         return calendar.range(of: .day, in: .month, for: date)?.count ?? 0
@@ -67,7 +86,7 @@ final class CalendarViewModel: ObservableObject {
     
     // 선택된 달에 표시할 날짜 목록
     // (이전 달 말 일부 + 이번 달 전체 + 다음 달 초 일부 포함)
-    func getMonthDate() {
+    func getMonthDate(for month: Date) -> [CalendarDate] {
         let components = calendar.dateComponents([.year, .month], from: month)
         let firstDate = calendar.date(from: components)!
         let daysInMonth: Int = numberOfDays(in: month)
@@ -79,7 +98,7 @@ final class CalendarViewModel: ObservableObject {
         let startOffset = -startDayOfMonth
         let endOffset = (daysInMonth - 1) + visibleDaysOfNextMonth
         
-        monthDates = (startOffset...endOffset).compactMap { offset in
+        return (startOffset...endOffset).compactMap { offset in
             guard let date = calendar.date(byAdding: .day, value: offset, to: firstDate) else { return nil }
             let day = calendar.component(.day, from: date)
             return CalendarDate(day: day, date: date)
@@ -87,13 +106,13 @@ final class CalendarViewModel: ObservableObject {
     }
     
     // 선택된 주에 포함되는 날짜 목록
-    func getWeekDate() {
+    func getWeekDate(for week: Date) -> [CalendarDate] {
         let today = calendar.startOfDay(for: week)
         let todayDay = calendar.component(.weekday, from: today) - 1
         
         let sunday = calendar.date(byAdding: .day, value: -(todayDay), to: today)!
         
-        weekDates = (0..<7).compactMap { offset in
+        return (0..<7).compactMap { offset in
             guard let date = calendar.date(byAdding: .day, value: offset, to: sunday) else { return nil }
             let day = calendar.component(.day, from: date)
             return CalendarDate(day: day, date: date)

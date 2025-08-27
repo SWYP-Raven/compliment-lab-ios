@@ -10,6 +10,7 @@ import SwiftUI
 struct CalendarView: View {
     @ObservedObject var calendarViewModel: CalendarViewModel
     @State var offset: CGSize = CGSize()
+    @State private var page = 1
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -20,49 +21,61 @@ struct CalendarView: View {
             WeekdayHeaderView()
             
             if calendarViewModel.mode == .month {
-                CalendarGridView(calendarViewModel: calendarViewModel, dates: calendarViewModel.monthDates)
-                .gesture(
-                    DragGesture()
-                        .onChanged { gesture in
-                            if abs(gesture.translation.width) > 10 { // 일정 수준 이상 드래그 되었을 때만 처리
-                                calendarViewModel.isDragging = true
-                            }
-                            self.offset = gesture.translation
-                        }
-                        .onEnded { gesture in
-                            if gesture.translation.width < -100 {
-                                calendarViewModel.changeMonth(by: 1)
-                            } else if gesture.translation.width > 100 {
-                                calendarViewModel.changeMonth(by: -1)
-                            }
-                            self.offset = CGSize()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                self.calendarViewModel.isDragging = false
-                            }
-                        }
-                )
+                TabView(selection: $page) {
+                    CalendarGridView(calendarViewModel: calendarViewModel, dates: calendarViewModel.prevMonthDates)
+                        .tag(0)
+                    
+                    CalendarGridView(calendarViewModel: calendarViewModel, dates: calendarViewModel.monthDates)
+                        .tag(1)
+                    
+                    CalendarGridView(calendarViewModel: calendarViewModel, dates: calendarViewModel.nextMonthDates)
+                        .tag(2)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .onChange(of: page) { _, new in
+                    switch new {
+                    case 0:
+                        calendarViewModel.changeMonth(by: -1)
+                        page = 1
+                    case 2:
+                        // 오른쪽으로 스와이프하여 '다음 달' 페이지에 도달
+                        calendarViewModel.changeMonth(by: 1)
+                        page = 1
+                    default:
+                        break
+                    }
+                }
             } else {
-                CalendarGridView(calendarViewModel: calendarViewModel, dates: calendarViewModel.weekDates)
-                .gesture(
-                    DragGesture()
-                        .onChanged { gesture in
-                            if abs(gesture.translation.width) > 10 { // 일정 수준 이상 드래그 되었을 때만 처리
-                                calendarViewModel.isDragging = true
-                            }
-                            self.offset = gesture.translation
-                        }
-                        .onEnded { gesture in
-                            if gesture.translation.width < -100 {
-                                calendarViewModel.changeWeek(by: 1)
-                            } else if gesture.translation.width > 100 {
-                                calendarViewModel.changeWeek(by: -1)
-                            }
-                            self.offset = CGSize()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                self.calendarViewModel.isDragging = false
-                            }
-                        }
-                )
+                TabView(selection: $page) {
+                    CalendarGridView(calendarViewModel: calendarViewModel, dates: calendarViewModel.prevWeekDates)
+                        .tag(0)
+                    
+                    CalendarGridView(calendarViewModel: calendarViewModel, dates: calendarViewModel.weekDates)
+                        .tag(1)
+                    
+                    CalendarGridView(calendarViewModel: calendarViewModel, dates: calendarViewModel.nextWeekDates)
+                        .tag(2)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .onChange(of: page) { _, new in
+                    switch new {
+                    case 0:
+                        // 왼쪽으로 스와이프하여 '이전 달' 페이지에 도달
+                        calendarViewModel.changeWeek(by: -1)
+                        
+                        // 페이지는 다시 가운데로 되돌려 무한 스와이프처럼 보이게
+                        // 애니메이션 끄고 즉시 리셋(깜빡임 방지)
+                        withAnimation(nil) { page = 1 }
+                        
+                    case 2:
+                        // 오른쪽으로 스와이프하여 '다음 달' 페이지에 도달
+                        calendarViewModel.changeWeek(by: 1)
+                        withAnimation(nil) { page = 1 }
+                        
+                    default:
+                        break
+                    }
+                }
             }
             
             Spacer()
@@ -85,11 +98,12 @@ struct CalendarGridView: View {
         }
         .task {
             if calendarViewModel.mode == .month {
-                calendarViewModel.getMonthDate()
+                calendarViewModel.monthDates = calendarViewModel.getMonthDate(for: calendarViewModel.month)
             } else {
-                calendarViewModel.getWeekDate()
+                calendarViewModel.weekDates = calendarViewModel.getWeekDate(for: calendarViewModel.week)
             }
         }
+        .frame(maxHeight: .infinity, alignment: .top)
     }
 }
 
