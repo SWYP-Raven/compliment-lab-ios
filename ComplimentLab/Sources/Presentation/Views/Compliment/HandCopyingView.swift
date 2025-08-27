@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HandCopyingView: View {
     @StateObject var viewModel = HandCopyingViewModel()
+    @StateObject private var toastManager = ToastManager()
     private let sentence: String
     
     init(sentence: String) {
@@ -33,7 +34,7 @@ struct HandCopyingView: View {
                 VStack(spacing: 26) {
                     Image("Character Pink Stiker L")
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    TracingTextView(viewModel: viewModel, sentence: sentence)
+                    TracingTextView(viewModel: viewModel, toastManager: toastManager, sentence: sentence)
                     Image("logo home")
                 }
                 .frame(maxWidth: .infinity)
@@ -42,6 +43,13 @@ struct HandCopyingView: View {
                 .background(Color.pink2)
                 .clipShape(RoundedRectangle(cornerRadius: 15))
                 .padding(.bottom, 15)
+                
+                Spacer()
+                
+                if toastManager.isShowing {
+                    ToastView(message: toastManager.message)
+                        .padding(.bottom, 22)
+                }
             }
             .padding(.horizontal, 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

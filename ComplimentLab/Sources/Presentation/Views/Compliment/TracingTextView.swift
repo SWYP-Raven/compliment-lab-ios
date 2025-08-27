@@ -9,13 +9,15 @@ import SwiftUI
 
 struct TracingTextView: View {
     @ObservedObject var viewModel: HandCopyingViewModel
+    @ObservedObject var toastManager: ToastManager
     @State private var texts: [String]
     @State private var textCounts: [Int]
     private let sentence: String
     private let lines: [String]
 
-    init(viewModel: HandCopyingViewModel, sentence: String) {
+    init(viewModel: HandCopyingViewModel, toastManager: ToastManager, sentence: String) {
         self.viewModel = viewModel
+        self.toastManager = toastManager
         self.sentence = sentence.precomposedStringWithCanonicalMapping
         self.lines = sentence.components(separatedBy: "\n")
         _texts = State(initialValue: Array(repeating: "", count: lines.count))
@@ -71,10 +73,10 @@ struct TracingTextView: View {
             if fullInput == sentence {
                 print("동일")
             } else {
-                print("조금 다름")
+                toastManager.show(message: "조금 다르네요, 다시 해볼까요?")
             }
         } else {
-            print("미입력")
+            toastManager.show(message: "더 입력해주면 완성할 수 있어요!")
         }
     }
     
@@ -138,5 +140,5 @@ struct TracingTextView: View {
 }
 
 #Preview {
-    TracingTextView(viewModel: HandCopyingViewModel(), sentence: "")
+    TracingTextView(viewModel: HandCopyingViewModel(), toastManager: ToastManager(), sentence: "")
 }
