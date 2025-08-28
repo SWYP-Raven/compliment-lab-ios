@@ -21,8 +21,7 @@ struct OnboardingView: View {
         NavigationStack {
             ZStack {
                 onboardingContent
-                
-                // Custom Modal 사용
+
                 if showAgreeView {
                     AgreeModalView() {
                         AgreementView(onAgreementCompleted: {
@@ -45,7 +44,6 @@ struct OnboardingView: View {
     
     private var onboardingContent: some View {
         VStack {
-            // 위쪽 커스텀 Indicator
             HStack(spacing: 10) {
                 ForEach(0..<totalPages, id: \.self) { index in
                     if index == currentPage {
@@ -124,7 +122,6 @@ struct OnboardingView: View {
     }
     
     
-    // Apple 로그인 실행
     private func performAppleLogin() {
         let request = ASAuthorizationAppleIDProvider().createRequest()
         request.requestedScopes = [.fullName, .email]
@@ -155,12 +152,12 @@ struct OnboardingPageView: View {
                 .font(.suite(.semiBold, size: 14))
                 .foregroundColor(Color.gray6)
                 .multilineTextAlignment(.center)
-                .lineLimit(nil) // 줄 제한 없음
-                .fixedSize(horizontal: false, vertical: true) // 세로로 확장 허용
-                .padding(.horizontal, 20) // 좌우 여백으로 텍스트 영역 확보
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 20)
                 .padding(.bottom, 95)
             
-            Image(imageName) // Assets에 넣어둔 이미지
+            Image(imageName)
                 .resizable()
                 .scaledToFit()
                 .frame(height: 257.28)

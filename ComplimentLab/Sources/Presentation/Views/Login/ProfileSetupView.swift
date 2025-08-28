@@ -11,6 +11,7 @@ struct ProfileSetupView: View {
     @StateObject private var toastManager = ToastManager()
     @State private var nickname: String = ""
     @State private var showToast = false
+    @State private var navigateToMain = false
     @FocusState private var isTextFieldFocused: Bool
     
     private let maxLength = 10
@@ -72,7 +73,8 @@ struct ProfileSetupView: View {
             Spacer()
 
             Button(action: {
-                
+                // 회원가입 API 응답완료 뒤 시점으로 변경
+                navigateToMain = true
             }) {
                 Text("청천연구소 입장하기")
                     .font(.suite(.bold, size: 17))
@@ -95,6 +97,9 @@ struct ProfileSetupView: View {
         }
         .background(Color.white)
         .toast(manager: toastManager)
+        .fullScreenCover(isPresented: $navigateToMain) {
+                    CustomTabView()
+                }
     }
 }
 

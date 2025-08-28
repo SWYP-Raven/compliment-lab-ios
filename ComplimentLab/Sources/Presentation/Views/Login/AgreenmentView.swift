@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-private let serviceUrl = "https://morning-eustoma-934.notion.site/25134b4c56f080bb9e36c7cff0656e97?pvs=97#25134b4c56f080fbb8cef4f49cbdfe72"
+private let serviceUrl = "https://morning-eustoma-934.notion.site/25134b4c56f080bb9e36c7cff0656e97?pvs=97"
 
-private let personalUrl = "https://morning-eustoma-934.notion.site/25134b4c56f080bb9e36c7cff0656e97?pvs=97#25134b4c56f0802ca54bedb317c34092"
+private let personalUrl = "https://morning-eustoma-934.notion.site/25134b4c56f080bb9e36c7cff0656e97?pvs=97"
 
-private let adUrl = "https://morning-eustoma-934.notion.site/25134b4c56f080bb9e36c7cff0656e97?pvs=97#25134b4c56f080fbb8cef4f49cbdfe72"
+private let adUrl = "https://morning-eustoma-934.notion.site/25134b4c56f080bb9e36c7cff0656e97?pvs=97"
 
 struct AgreementItem {
     let title: String
@@ -33,8 +33,7 @@ struct AgreementView: View {
     ]
     
     @State private var agreeToAll: Bool = false
-    @State private var showWebView = false
-    @State private var selectedURL: String = ""
+    @State private var webViewItem: WebViewItem?
     
     private var allRequiredAgreed: Bool {
         agreementItems.filter { $0.isRequired }.allSatisfy { $0.isAgreed }
@@ -72,9 +71,7 @@ struct AgreementView: View {
                                     .foregroundColor(.gray6)
                                 Button(action: {
                                     guard let url = agreementItems[index].url else { return }
-                                    selectedURL = url
-                                    showWebView = true
-                                    print(#function, #line)
+                                    webViewItem = .init(url: url)
                                 }) {
                                     Text(agreementItems[index].title)
                                         .font(.suite(.semiBold, size: 14))
@@ -144,8 +141,8 @@ struct AgreementView: View {
             .disabled(!allRequiredAgreed)
             .padding(.horizontal, 20)
         }
-        .sheet(isPresented: $showWebView) {
-            WebView(url: selectedURL)
+        .sheet(item: $webViewItem) { url in
+            WebView(url: url.url)
         }
     }
     
@@ -157,8 +154,17 @@ struct AgreementView: View {
 // MARK: - WebView for Terms & Privacy
 import WebKit
 
+struct WebViewItem: Identifiable {
+    let id = UUID()
+    let url: String
+}
+
 struct WebView: UIViewRepresentable {
     let url: String
+    
+    init(url: String) {
+        self.url = url
+    }
     
     func makeUIView(context: Context) -> WKWebView {
         let webView = WKWebView()
@@ -171,10 +177,9 @@ struct WebView: UIViewRepresentable {
     func updateUIView(_ uiView: WKWebView, context: Context) {}
 }
 
+
 #Preview {
     AgreementView(onAgreementCompleted: {
         
     })
 }
-
-

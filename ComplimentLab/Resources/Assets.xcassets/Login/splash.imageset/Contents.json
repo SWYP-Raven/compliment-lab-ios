@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "splash flower.png",
+      "filename" : "Frame 2085670637.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "splash flower@2x.png",
+      "filename" : "Frame 2085670637@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "splash flower@3x.png",
+      "filename" : "Frame 2085670637@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
