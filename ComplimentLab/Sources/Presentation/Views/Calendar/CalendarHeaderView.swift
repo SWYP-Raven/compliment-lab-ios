@@ -62,8 +62,6 @@ struct NavigateToFriendView: View {
         HStack {
             Image("Character Pink half")
             
-            Spacer()
-            
             VStack(alignment: .leading) {
                 Text("Username님,")
                     .font(.suite(.bold, size: 17))
@@ -73,12 +71,9 @@ struct NavigateToFriendView: View {
                     .font(.suite(.medium, size: 14))
                     .foregroundColor(Color.gray5)
             }
+            .padding(.leading, 23)
             
             Spacer()
-            
-            Image("Arrow right Default")
-                .renderingMode(.template)
-                .foregroundColor(Color.blue4)
         }
         .frame(maxWidth: .infinity)
         .padding(.leading, 22)

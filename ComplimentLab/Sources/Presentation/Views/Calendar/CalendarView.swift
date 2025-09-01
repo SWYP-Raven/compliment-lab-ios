@@ -11,6 +11,7 @@ struct CalendarView: View {
     @ObservedObject var calendarViewModel: CalendarViewModel
     @State var offset: CGSize = CGSize()
     @State private var page = 1
+    @Binding var selection: Int
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -18,6 +19,9 @@ struct CalendarView: View {
                 .padding(.bottom, 15)
             NavigateToFriendView()
                 .padding(.bottom, 18)
+                .onTapGesture {
+                    selection = 1
+                }
             WeekdayHeaderView()
             
             if calendarViewModel.mode == .month {
@@ -194,8 +198,4 @@ struct DateCellView: View {
             }
         }
     }
-}
-
-#Preview {
-    CalendarView(calendarViewModel: CalendarViewModel())
 }

@@ -27,7 +27,7 @@ struct CustomTabView: View {
         NavigationStack {
             ZStack {
                 TabView(selection: $selection) {
-                    CalendarView(calendarViewModel: calendarViewModel)
+                    CalendarView(calendarViewModel: calendarViewModel, selection: $selection)
                         .tabItem {
                             selection == 0 ? Image("Home Pressed") : Image("Home Default")
                             Text("일력")
