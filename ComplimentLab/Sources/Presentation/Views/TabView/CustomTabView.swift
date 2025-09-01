@@ -48,7 +48,7 @@ struct CustomTabView: View {
                         }
                         .tag(2)
                     
-                    Color.clear
+                    SettingView()
                         .tabItem {
                             selection == 3 ? Image("My Pressed") : Image("My Default")
                             Text("마이")

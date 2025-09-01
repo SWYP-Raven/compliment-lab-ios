@@ -94,8 +94,8 @@ struct CalendarView: View {
                         Image("Alarm Default")
                     }
                     
-                    Button {
-                        
+                    NavigationLink {
+                        SettingView(showBackButton: true)
                     } label: {
                         Image("Setting Default")
                     }
