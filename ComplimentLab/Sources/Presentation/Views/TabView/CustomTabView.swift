@@ -41,7 +41,7 @@ struct CustomTabView: View {
                         }
                         .tag(1)
                     
-                    Color.clear
+                    ArchiveView(calendarViewModel: calendarViewModel)
                         .tabItem {
                             selection == 2 ? Image("Archive Pressed") : Image("Archive Default")
                             Text("기록")
