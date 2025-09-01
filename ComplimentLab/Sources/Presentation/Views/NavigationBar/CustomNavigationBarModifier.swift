@@ -34,7 +34,8 @@ struct CustomNavigationBarModifier<C: View, L: View, R: View>: ViewModifier {
                 }
                 .frame(height: 24)
                 .frame(maxWidth: .infinity)
-                .padding(.horizontal, 20)
+                .padding(.leading, 13)
+                .padding(.trailing, 20)
                 .padding(.top, 6)
                 
                 HStack {

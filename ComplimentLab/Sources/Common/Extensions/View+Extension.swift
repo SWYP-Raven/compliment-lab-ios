@@ -11,7 +11,7 @@ extension View {
     func customNavigationBar<C: View, L: View, R: View>(
         @ViewBuilder centerView: @escaping () -> C = { EmptyView() },
         @ViewBuilder leftView: @escaping () -> L = { EmptyView() },
-        @ViewBuilder rightView: @escaping () -> R
+        @ViewBuilder rightView: @escaping () -> R = { EmptyView() }
     ) -> some View {
         self.modifier(CustomNavigationBarModifier(centerView: centerView,
                                                  leftView: leftView,
