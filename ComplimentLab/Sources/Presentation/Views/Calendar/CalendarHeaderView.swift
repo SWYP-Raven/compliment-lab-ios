@@ -27,7 +27,8 @@ struct CalendarHeaderView: View {
             
             Spacer()
             
-            CustomSegmentedControl(items: CalendarMode.allCases, selection: $calendarViewModel.mode)
+            CustomSegmentedControl(items: CalendarMode.allCases, cornerRadius: 13.5, selection: $calendarViewModel.mode)
+                .frame(width: 85, height: 26)
                 .onChange(of: calendarViewModel.mode) { _, newValue in
                     if newValue == .month {
                         calendarViewModel.monthDates = calendarViewModel.getMonthDate(for: calendarViewModel.month)

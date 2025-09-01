@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CustomSegmentedControl<T: Hashable & CustomStringConvertible>: View {
     let items: [T]
+    let cornerRadius: CGFloat
     @Binding var selection: T
     @Namespace private var ns
 
@@ -19,7 +20,7 @@ struct CustomSegmentedControl<T: Hashable & CustomStringConvertible>: View {
                 
                 ZStack {
                     if isSelected {
-                        RoundedRectangle(cornerRadius: 13.5, style: .continuous)
+                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                             .fill(Color.gray9)
                             .matchedGeometryEffect(id: "indicator", in: ns)
                     }
@@ -27,11 +28,10 @@ struct CustomSegmentedControl<T: Hashable & CustomStringConvertible>: View {
                     Text(item.description)
                         .font(.suite(.medium, size: 13))
                         .padding(.vertical, 4)
-//                        .padding(.horizontal, 11)
                         .frame(maxWidth: .infinity)
                         .foregroundStyle(isSelected ? Color.gray0 : Color.gray6)
                 }
-                .contentShape(RoundedRectangle(cornerRadius: 13.5, style: .continuous))
+                .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
                 .onTapGesture {
                     withAnimation {
                         selection = item
@@ -40,9 +40,8 @@ struct CustomSegmentedControl<T: Hashable & CustomStringConvertible>: View {
             }
         }
         .background(
-            RoundedRectangle(cornerRadius: 13.5, style: .continuous)
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .fill(Color.gray1)
         )
-        .frame(width: 85, height: 26)
     }
 }
