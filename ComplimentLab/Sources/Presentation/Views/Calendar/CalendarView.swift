@@ -15,9 +15,9 @@ struct CalendarView: View {
     var body: some View {
         VStack(alignment: .leading) {
             CalendarHeaderView(calendarViewModel: calendarViewModel)
-                .padding(.bottom, 10)
+                .padding(.bottom, 15)
             NavigateToFriendView()
-                .padding(.bottom, 8)
+                .padding(.bottom, 18)
             WeekdayHeaderView()
             
             if calendarViewModel.mode == .month {
@@ -81,6 +81,23 @@ struct CalendarView: View {
             Spacer()
         }
         .padding(.horizontal, 20)
+        .customNavigationBar(
+            rightView: {
+                HStack(spacing: 21) {
+                    Button {
+                        
+                    } label: {
+                        Image("Alarm Default")
+                    }
+                    
+                    Button {
+                        
+                    } label: {
+                        Image("Setting Default")
+                    }
+                }
+            }
+        )
     }
 }
 
@@ -90,7 +107,7 @@ struct CalendarGridView: View {
     
     var body: some View {
         VStack {
-            LazyVGrid(columns: Array(repeating: GridItem(), count: 7)) {
+            LazyVGrid(columns: Array(repeating: GridItem(), count: 7), spacing: 8) {
                 ForEach(dates) { value in
                     DateCellView(calendarViewModel: calendarViewModel, calendarDate: value)
                 }
@@ -116,7 +133,34 @@ struct DateCellView: View {
     }
     
     var body: some View {
-        VStack {
+        VStack(spacing: 8) {
+            // 날짜 텍스트 (버튼 아님)
+            switch dateState {
+            case .past:
+                Text("\(calendarDate.day)")
+                    .font(.suite(.medium, size: 12))
+                    .foregroundStyle(Color.gray6)
+
+            case .today:
+                Text("\(calendarDate.day)")
+                    .font(.suite(.medium, size: 12))
+                    .foregroundStyle(Color.gray0)
+                    .padding(.horizontal, 8)
+                    .background(Color.blue4)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
+            case .future:
+                Text("\(calendarDate.day)")
+                    .font(.suite(.medium, size: 12))
+                    .foregroundStyle(Color.gray6)
+
+            case .outsideMonth:
+                Text("\(calendarDate.day)")
+                    .font(.suite(.medium, size: 12))
+                    .foregroundStyle(Color.gray2)
+            }
+
+            // Circle만 버튼
             Button {
                 if !calendarViewModel.isDragging {
                     if Calendar.current.isDate(calendarDate.date, equalTo: calendarViewModel.month, toGranularity: .month) {
@@ -131,46 +175,21 @@ struct DateCellView: View {
                     }
                 }
             } label: {
-                VStack {
-                    switch dateState {
-                    case .past:
-                        Text("\(calendarDate.day)")
-                            .font(.suite(.medium, size: 12))
-                            .foregroundStyle(Color.gray6)
-                        
-                        Circle()
-                            .fill(Color.gray3)
-                    case .today:
-                        Text("\(calendarDate.day)")
-                            .font(.suite(.medium, size: 12))
-                            .foregroundStyle(Color.gray0)
-                            .padding(.horizontal, 8)
-                            .background(Color.blue4)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                        
-                        Circle()
-                            .fill(Color.blue1)
-                            .overlay(
-                                Image("Plus Default")
-                                    .renderingMode(.template)
-                                    .foregroundColor(Color.blue4)
-                            )
-                        
-                    case .future:
-                        Text("\(calendarDate.day)")
-                            .font(.suite(.medium, size: 12))
-                            .foregroundStyle(Color.gray6)
-                        
-                        Circle()
-                            .fill(Color.gray1)
-                    case .outsideMonth:
-                        Text("\(calendarDate.day)")
-                            .font(.suite(.medium, size: 12))
-                            .foregroundStyle(Color.gray2)
-                        
-                        Circle()
-                            .fill(Color.gray1)
-                    }
+                switch dateState {
+                case .past:
+                    Circle().fill(Color.gray3)
+                case .today:
+                    Circle()
+                        .fill(Color.blue1)
+                        .overlay(
+                            Image("Plus Default")
+                                .renderingMode(.template)
+                                .foregroundColor(Color.blue4)
+                        )
+                case .future:
+                    Circle().fill(Color.gray1)
+                case .outsideMonth:
+                    Circle().fill(Color.gray1)
                 }
             }
         }
