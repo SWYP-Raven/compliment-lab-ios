@@ -29,7 +29,7 @@ struct ArchiveView: View {
                     Button { archiveViewModel.sortByDate(type: .recent) } label: { Text("최근순") }
                     Button { archiveViewModel.sortByDate(type: .past) } label: { Text("이전순") }
                 } label: {
-                    Image(systemName: "text.alignleft")
+                    Image("list defalt")
                 }
             }
         )
@@ -49,7 +49,12 @@ struct DailyCalendarArchive: View {
                     NavigationLink(destination: TodayComplimentView()) {
                         VStack(alignment: .leading, spacing: 22) {
                             HStack(alignment: .center) {
-                                Image(systemName: "tree")
+                                Image("Character Pink Stiker S")
+                                    .frame(width: 40, height: 40)
+                                    .background(
+                                        Circle().fill(Color.pink2)
+                                    )
+                                
                                 Spacer()
                                 Text(changeDateFormat(date: compliment.date))
                                     .font(.suite(.medium, size: 12))
