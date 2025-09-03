@@ -13,7 +13,7 @@ enum SortType {
 }
 
 final class ArchiveViewModel: ObservableObject {
-    @Published var compliments: [Compliment] = Compliment.mockCompliments
+    @Published var dailyCompliments: [DailyCompliment] = DailyCompliment.mockCompliments
     
     func getArchivedCompliments(token: String, date: Date) {
         
@@ -21,9 +21,15 @@ final class ArchiveViewModel: ObservableObject {
     
     func sortByDate(type: SortType) {
         if type == .recent {
-            compliments = compliments.sorted { $0.date > $1.date }
+            dailyCompliments = dailyCompliments.sorted { $0.date > $1.date }
         } else {
-            compliments = compliments.sorted { $0.date < $1.date }
+            dailyCompliments = dailyCompliments.sorted { $0.date < $1.date }
+        }
+    }
+    
+    func toggleArchive(id: String) {
+        if let index = dailyCompliments.firstIndex(where: { $0.id == id }) {
+            dailyCompliments[index].isArchived.toggle()
         }
     }
 }

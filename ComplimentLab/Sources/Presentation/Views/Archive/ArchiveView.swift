@@ -10,6 +10,7 @@ import SwiftUI
 struct ArchiveView: View {
     @StateObject private var archiveViewModel = ArchiveViewModel()
     @ObservedObject var calendarViewModel: CalendarViewModel
+    @ObservedObject var complimentViewModel: ComplimentViewModel
     @State var selectedPick = "일력"
     
     var body: some View {
@@ -17,7 +18,7 @@ struct ArchiveView: View {
             ArchiveHeaderView(calendarViewModel: calendarViewModel, selectedPick: $selectedPick)
             
             if selectedPick == "일력" {
-                DailyCalendarArchive(archiveViewModel: archiveViewModel)
+                DailyCalendarArchive(archiveViewModel: archiveViewModel, calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel)
             } else {
                 // 칭찬 아카이브
             }
@@ -41,12 +42,14 @@ struct ArchiveView: View {
 
 struct DailyCalendarArchive: View {
     @ObservedObject var archiveViewModel: ArchiveViewModel
+    @ObservedObject var calendarViewModel: CalendarViewModel
+    @ObservedObject var complimentViewModel: ComplimentViewModel
     
     var body: some View {
         ScrollView(showsIndicators: false) {
             LazyVStack {
-                ForEach(archiveViewModel.compliments, id: \.self) { compliment in
-                    NavigationLink(destination: TodayComplimentView()) {
+                ForEach($archiveViewModel.dailyCompliments) { $dailyCompliment in
+                    NavigationLink(destination: TodayComplimentView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel)) {
                         VStack(alignment: .leading, spacing: 22) {
                             HStack(alignment: .center) {
                                 Image("Character Pink Stiker S")
@@ -56,23 +59,24 @@ struct DailyCalendarArchive: View {
                                     )
                                 
                                 Spacer()
-                                Text(changeDateFormat(date: compliment.date))
+                                Text(changeDateFormat(date: dailyCompliment.date))
                                     .font(.suite(.medium, size: 12))
                                     .foregroundStyle(Color.gray4)
                                 
                                 Button {
+                                    archiveViewModel.toggleArchive(id: dailyCompliment.id)
                                 } label: {
                                     ZStack {
                                         Image("Flower Default Default")
                                         
-//                                        if flowerPressed {
-//                                            Image("Flower Pressed")
-//                                        }
+                                        if dailyCompliment.isArchived {
+                                            Image("Flower Pressed")
+                                        }
                                     }
                                 }
                             }
                             
-                            Text("\(compliment.text)")
+                            Text("\(dailyCompliment.compliment.title)")
                                 .font(.suite(.medium, size: 14))
                                 .foregroundStyle(Color.gray9)
                         }
@@ -82,13 +86,17 @@ struct DailyCalendarArchive: View {
                         .clipShape(RoundedRectangle(cornerRadius: 15))
                         .padding(.bottom, 18)
                     }
+                    .simultaneousGesture(TapGesture().onEnded {
+                        calendarViewModel.selectDate = dailyCompliment.date
+                        complimentViewModel.dailyCompliment = dailyCompliment
+                    })
                     .buttonStyle(PlainButtonStyle())
                 }
             }
         }
     }
     
-    func changeDateFormat(date: Date) -> String {
+    private func changeDateFormat(date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
@@ -125,8 +133,3 @@ struct ArchiveHeaderView: View {
         }
     }
 }
-
-#Preview {
-    ArchiveView(calendarViewModel: CalendarViewModel())
-}
-

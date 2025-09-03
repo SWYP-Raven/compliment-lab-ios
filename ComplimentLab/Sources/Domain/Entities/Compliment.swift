@@ -9,52 +9,75 @@ import Foundation
 
 struct Compliment: Identifiable, Codable, Hashable {
     let id: String
-    let text: String
-    let date: Date
+    let title: String
     let type: String
-    let archived: Bool
-    let isChecked: Bool
+}
+
+struct DailyCompliment: Codable, Identifiable, Hashable {
+    let id: String
+    let compliment: Compliment
+    let date: Date
+    var isArchived: Bool
+    var isRead: Bool
     
-    static var mockCompliments: [Compliment] = [
-        Compliment(
+    static var mockCompliments: [DailyCompliment] = [
+        DailyCompliment(
             id: UUID().uuidString,
-            text: "오늘도 고생 많았어요!\n작은 노력들이 모여 큰 변화를 만들어요.",
+            compliment: Compliment(
+                id: UUID().uuidString,
+                title: "오늘도 고생 많았어요!\n작은 노력들이 모여 큰 변화를 만들어요.",
+                type: "과정"
+            ),
             date: ISO8601DateFormatter().date(from: "2025-07-16T00:00:00Z")!,
-            type: "",
-            archived: false,
-            isChecked: false
+            isArchived: false,
+            isRead: false
         ),
-        Compliment(
+        DailyCompliment(
             id: UUID().uuidString,
-            text: "작은 노력들이 모여 큰 변화를 만들어요.",
+            compliment: Compliment(
+                id: UUID().uuidString,
+                title: "작은 노력들이 모여 큰 변화를 만들어요.",
+                type: "행동"
+            ),
             date: ISO8601DateFormatter().date(from: "2025-08-05T00:00:00Z")!,
-            type: "",
-            archived: false,
-            isChecked: true
+            isArchived: false,
+            isRead: true
         ),
-        Compliment(
+        DailyCompliment(
             id: UUID().uuidString,
-            text: "꾸준함이 가장 큰 힘이에요.",
+            compliment: Compliment(
+                id: UUID().uuidString,
+                title: "꾸준함이 가장 큰 힘이에요.",
+                type: "과정"
+            ),
             date: ISO8601DateFormatter().date(from: "2025-08-15T00:00:00Z")!,
-            type: "",
-            archived: true,
-            isChecked: false
+            isArchived: true,
+            isRead: false
         ),
-        Compliment(
+        DailyCompliment(
             id: UUID().uuidString,
-            text: "당신의 성장은 멋져요!",
+            compliment: Compliment(
+                id: UUID().uuidString,
+                title: "당신의 성장은 멋져요!",
+                type: "결과"
+            ),
             date: ISO8601DateFormatter().date(from: "2025-08-24T00:00:00Z")!,
-            type: "",
-            archived: false,
-            isChecked: false
+            isArchived: false,
+            isRead: false
         ),
-        Compliment(
+        DailyCompliment(
             id: UUID().uuidString,
-            text: "믿음직스럽고 든든해요.",
-            date: ISO8601DateFormatter().date(from: "2025-08-26T00:00:00Z")!,
-            type: "",
-            archived: true,
-            isChecked: true
+            compliment: Compliment(
+                id: UUID().uuidString,
+                title: "믿음직스럽고 든든해요.",
+                type: "행동"
+            ),
+            date: ISO8601DateFormatter().date(from: "2025-09-03T00:00:00Z")!,
+            isArchived: true,
+            isRead: true
         )
     ]
+    
+    static let mockComplimentsMap: [Date: DailyCompliment] =
+        Dictionary(uniqueKeysWithValues: mockCompliments.map { (Calendar.current.startOfDay(for: $0.date), $0) })
 }
