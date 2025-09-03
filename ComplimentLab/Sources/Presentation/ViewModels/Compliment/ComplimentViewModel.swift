@@ -7,7 +7,16 @@
 
 import Foundation
 
-final class HandCopyingViewModel: ObservableObject {
+final class ComplimentViewModel: ObservableObject {
+    @Published var dailyCompliment: DailyCompliment?
+    @Published var copyingSuccess: Bool = false
+    @Published var flowerPressed: Bool = false
+    let sentence: String = "오늘도 한 발자국 나아갔네요.\n그 걸음이 모여 더 큰 변화를 만들 거예요!"
+    
+    func toggleArchive() {
+        dailyCompliment?.isArchived.toggle()
+    }
+    
     // 한글 완성형 분해: (초/중/종) 인덱스
     /**
      종성 = 완성형 % 28
