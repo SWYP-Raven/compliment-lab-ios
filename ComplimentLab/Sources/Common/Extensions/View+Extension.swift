@@ -17,4 +17,19 @@ extension View {
                                                  leftView: leftView,
                                                  rightView: rightView))
     }
+    
+    func snapshotImage(
+        size: CGSize = .init(width: 335, height: 498),
+        scale: CGFloat = 3.0
+    ) -> Image? {
+        let card = self.frame(width: size.width, height: size.height)
+
+        let r = ImageRenderer(content: card)
+        r.proposedSize = .init(width: size.width, height: size.height)
+        r.scale = scale
+        r.isOpaque = false
+
+        guard let ui = r.uiImage else { return nil }
+        return Image(uiImage: ui)
+    }
 }
