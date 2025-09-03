@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct TracingTextView: View {
-    @ObservedObject var viewModel: HandCopyingViewModel
+    @ObservedObject var viewModel: ComplimentViewModel
     @ObservedObject var toastManager: ToastManager
     @State private var texts: [String]
     @State private var textCounts: [Int]
     private let sentence: String
     private let lines: [String]
 
-    init(viewModel: HandCopyingViewModel, toastManager: ToastManager, sentence: String) {
+    init(viewModel: ComplimentViewModel, toastManager: ToastManager, sentence: String) {
         self.viewModel = viewModel
         self.toastManager = toastManager
         self.sentence = sentence.precomposedStringWithCanonicalMapping
@@ -66,18 +66,21 @@ struct TracingTextView: View {
         }
     }
     
-    private func validateHandCopying() {
+    private func validateHandCopying() -> Bool {
         let fullInput = texts.joined(separator: "\n").precomposedStringWithCanonicalMapping
         
         if fullInput.count == sentence.count {
             if fullInput == sentence {
-                print("동일")
+                viewModel.copyingSuccess = true
+                return true
             } else {
                 toastManager.show(message: "조금 다르네요, 다시 해볼까요?")
             }
         } else {
             toastManager.show(message: "더 입력해주면 완성할 수 있어요!")
         }
+        
+        return false
     }
     
     // MARK: Overlay builder
@@ -140,5 +143,5 @@ struct TracingTextView: View {
 }
 
 #Preview {
-    TracingTextView(viewModel: HandCopyingViewModel(), toastManager: ToastManager(), sentence: "")
+    TracingTextView(viewModel: ComplimentViewModel(), toastManager: ToastManager(), sentence: "")
 }

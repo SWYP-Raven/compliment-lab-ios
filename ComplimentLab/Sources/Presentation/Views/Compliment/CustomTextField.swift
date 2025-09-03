@@ -13,7 +13,7 @@ struct CustomTextField: UIViewRepresentable {
     @Binding var textCount: Int
     let sentence: String
     let tagIndex: Int
-    var onReturn: (() -> Void)? = nil
+    var onReturn: (() -> Bool)? = nil
     
     func makeUIView(context: Context) -> MyTextField {
         let textField = MyTextField()
@@ -157,7 +157,13 @@ struct CustomTextField: UIViewRepresentable {
         
         // 키보드 완료 버튼 클릭 시
         func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-            parent.onReturn?()
+            let success = parent.onReturn?() ?? true
+            
+            // 성공시에만 키보드 내리기
+            if success {
+                textField.resignFirstResponder()
+            }
+            
             return true
         }
         
