@@ -15,34 +15,26 @@ struct SettingAlertView: View {
     private let secondItems = ["마케팅 활용 동의", "이벤트 혜택 알림"]
     
     var body: some View {
-        List {
-            Section {
-                ForEach(firstItems.indices, id: \.self) { index in
-                    Toggle(isOn: $firstToggleStates[index]) {
-                        Text(firstItems[index])
-                            .font(.suite(.bold, size: 17))
-                    }
+        VStack(alignment: .leading, spacing: 32) {
+            ForEach(firstItems.indices, id: \.self) { index in
+                Toggle(isOn: $firstToggleStates[index]) {
+                    Text(firstItems[index])
+                        .font(.suite(.bold, size: 17))
                 }
-            } footer: {
-                Divider()
-                    .listRowInsets(EdgeInsets(top: -12, leading: 20, bottom: 0, trailing: 20))
             }
-            .listRowSeparator(.hidden)
             
-            Section {
-                ForEach(secondItems.indices, id: \.self) { index in
-                    Toggle(isOn: $secondToggleStates[index]) {
-                        Text(secondItems[index])
-                            .font(.suite(.bold, size: 17))
-                    }
+            Divider()
+            
+            ForEach(secondItems.indices, id: \.self) { index in
+                Toggle(isOn: $secondToggleStates[index]) {
+                    Text(secondItems[index])
+                        .font(.suite(.bold, size: 17))
                 }
             }
-            .listRowSeparator(.hidden)
+            
+            Spacer()
         }
-        .listStyle(.plain)
-        .listRowSpacing(12)
-        .scrollDisabled(true)
-        .padding(.top, 40)
+        .padding(.horizontal, 20)
     }
 }
 

@@ -19,61 +19,41 @@ struct SettingView: View {
     var showBackButton: Bool = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 25) {
+        VStack(alignment: .leading, spacing: 32) {
             SettingNicknameView()
             
             Divider()
                 .frame(height: 10)
                 .overlay(Color.gray1)
             
-            List {
-                Section {
-                    NavigationLink(destination: SettingAlertView()) {
-                        Text("알림 설정")
-                            .font(.suite(.bold, size: 17))
-                            .foregroundStyle(Color.gray8)
-                            .listRowBackground(Color.clear)
-                    }
-                    .listRowBackground(Color.clear)
-                } footer: {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 32) {
+                    SettingRow(title: "알림 설정", destination: AnyView(SettingAlertView()))
+
                     Divider()
-                        .listRowInsets(EdgeInsets(top: -12, leading: 20, bottom: 0, trailing: 20))
-                }
-                .listRowSeparator(.hidden)
-                
-                Section {
-                    ForEach(SettingItem.allCases, id: \.self) { item in
-                        NavigationLink {
-                            switch item {
-                            case .notice:
-                                EmptyView()
-                            case .feedback:
-                                FeedbackView()
-                            case .account:
-                                EmptyView()
-                            }
-                        } label: {
-                            Text(item.rawValue)
-                                .font(.suite(.bold, size: 17))
-                                .foregroundStyle(Color.gray8)
-                        }
-                        .listRowBackground(Color.clear)
-                    }
-                } footer: {
-                    Divider()
-                        .listRowInsets(EdgeInsets(top: -12, leading: 20, bottom: 0, trailing: 20))
-                }
-                .listRowSeparator(.hidden)
-                
-                
-                Section {
-                    NavigationLink(destination: EmptyView()) {
-                        Text("서비스 이용 약관")
-                            .font(.suite(.bold, size: 17))
-                            .foregroundStyle(Color.gray8)
-                    }
-                    .listRowBackground(Color.clear)
                     
+                    ForEach(SettingItem.allCases, id: \.self) { item in
+                        SettingRow(
+                            title: item.rawValue,
+                            destination: AnyView(
+                                Group {
+                                    switch item {
+                                    case .notice:
+                                        NoticeView()
+                                    case .feedback:
+                                        FeedbackView()
+                                    case .account:
+                                        AccountManagementView()
+                                    }
+                                }
+                            )
+                        )
+                    }
+                    
+                    Divider()
+                    
+                    SettingRow(title: "서비스 이용 약관", destination: AnyView(EmptyView()))
+
                     HStack {
                         Text("앱 버전 정보")
                             .font(.suite(.bold, size: 17))
@@ -87,13 +67,9 @@ struct SettingView: View {
                             .foregroundStyle(Color.gray8)
                     }
                 }
-                .listRowSeparator(.hidden)
             }
-            .listStyle(.plain)
-            .listRowSpacing(12)
             .scrollDisabled(true)
-            
-            Spacer()
+            .padding(.horizontal, 20)
         }
         .customNavigationBar(
             leftView: {
@@ -106,6 +82,24 @@ struct SettingView: View {
                 }
             }
         )
+    }
+}
+
+struct SettingRow: View {
+    let title: String
+    let destination: AnyView
+    
+    var body: some View {
+        NavigationLink(destination: destination) {
+            HStack {
+                Text(title)
+                    .font(.suite(.bold, size: 17))
+                    .foregroundStyle(Color.gray8)
+                Spacer()
+                Image("My Arrow right Default")
+                    .padding(.trailing, -7)
+            }
+        }
     }
 }
 
