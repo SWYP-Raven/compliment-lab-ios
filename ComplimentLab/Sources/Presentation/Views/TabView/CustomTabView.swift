@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CustomTabView: View {
     @StateObject var calendarViewModel = CalendarViewModel()
+    @StateObject var complimentViewModel = ComplimentViewModel()
     @State private var selection = 0
     
     init() {
@@ -27,7 +28,7 @@ struct CustomTabView: View {
         NavigationStack {
             ZStack {
                 TabView(selection: $selection) {
-                    CalendarView(calendarViewModel: calendarViewModel, selection: $selection)
+                    CalendarView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, selection: $selection)
                         .tabItem {
                             selection == 0 ? Image("Home Pressed") : Image("Home Default")
                             Text("일력")
@@ -41,7 +42,7 @@ struct CustomTabView: View {
                         }
                         .tag(1)
                     
-                    ArchiveView(calendarViewModel: calendarViewModel)
+                    ArchiveView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel)
                         .tabItem {
                             selection == 2 ? Image("Archive Pressed") : Image("Archive Default")
                             Text("기록")
@@ -69,7 +70,7 @@ struct CustomTabView: View {
                 }
             }
             .navigationDestination(isPresented: $calendarViewModel.isButtonTapped) {
-                TodayComplimentView()
+                TodayComplimentView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel)
             }
         }
     }
