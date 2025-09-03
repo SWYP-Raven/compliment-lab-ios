@@ -8,69 +8,40 @@
 import SwiftUI
 
 struct TodayComplimentView: View {
-    @State private var flowerPressed: Bool = false
-    private let sentence: String = "오늘도 한 발자국 나아갔네요.\n그 걸음이 모여 더 큰 변화를 만들 거예요!"
+    @EnvironmentObject var toastManager: ToastManager
+    @ObservedObject var calendarViewModel: CalendarViewModel
+    @ObservedObject var complimentViewModel: ComplimentViewModel
     
     var body: some View {
         ZStack {
             Color.pink1.ignoresSafeArea()
             
             VStack {
-                Text("2025년")
-                    .font(.suite(.bold, size: 17))
-                    .foregroundStyle(Color.gray8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 18)
-                    .padding(.bottom, 15)
-                
-                VStack(spacing: 26) {
-                    FlowerView()
+                if let dailyCompliment = complimentViewModel.dailyCompliment {
+                    YearHeaderView(date: dailyCompliment.date)
                     
-                    VStack(spacing: 28) {
-                        NavigationLink {
-                            HandCopyingView(sentence: sentence)
-                        } label: {
-                            ComplimentTextView(sentence: sentence)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        
-                        Image("logo home")
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 17)
-                .padding(.vertical, 25)
-                .background(Color.pink2)
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-                .padding(.bottom, 15)
-                .overlay(
-                    Image("Character Pink Stiker L")
-                        .padding(.top, 25)
-                        .padding(.leading, 17),
-                    alignment: .topLeading
-                )
-                
-                HStack(spacing: 21) {
-                    Spacer()
-                    
-                    Button {
-                        flowerPressed.toggle()
-                    } label: {
-                        ZStack {
-                            Image("Flower Default Default")
-                            
-                            // TODO: - 아카이브
-                            if flowerPressed {
-                                Image("Flower Pressed")
-                            }
-                        }
-                    }
-                
-                    let vstackView = VStack(spacing: 26) {
-                        FlowerView()
+                    VStack(spacing: 26) {
+                        FlowerView(date: dailyCompliment.date)
                         
                         VStack(spacing: 28) {
-                            ComplimentTextView(sentence: sentence)
+                            let isToday = calendarViewModel.isSameDay(date1: calendarViewModel.selectDate, date2: calendarViewModel.today)
+                            
+                            if isToday {
+                                NavigationLink {
+                                    HandCopyingView(complimentViewModel: complimentViewModel)
+                                } label: {
+                                    ComplimentTextView(sentence: dailyCompliment.compliment.title)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            } else {
+                                Button {
+                                    toastManager.show(message: "앗, 오늘의 칭찬만 따라 쓸 수 있어요")
+                                } label: {
+                                    ComplimentTextView(sentence: dailyCompliment.compliment.title)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                            
                             Image("logo home")
                         }
                     }
@@ -78,6 +49,7 @@ struct TodayComplimentView: View {
                     .padding(.horizontal, 17)
                     .padding(.vertical, 25)
                     .background(Color.pink2)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
                     .padding(.bottom, 15)
                     .overlay(
                         Image("Character Pink Stiker L")
@@ -86,47 +58,84 @@ struct TodayComplimentView: View {
                         alignment: .topLeading
                     )
                     
-                    if let swiftUIImage = snapshotCardImage(vstackView) {
-                        let photo = Photo(image: swiftUIImage, caption: "오늘의 칭찬")
-                        ShareLink(
-                            item: photo,
-                            preview: SharePreview(
-                                photo.caption,
-                                image: photo.image
-                            )
-                        ) {
-                            Image("Send Default")
+                    HStack(spacing: 21) {
+                        Spacer()
+                        
+                        Button {
+                            complimentViewModel.toggleArchive()
+                        } label: {
+                            ZStack {
+                                Image("Flower Default Default")
+                                
+                                // TODO: - 아카이브
+                                if dailyCompliment.isArchived {
+                                    Image("Flower Pressed")
+                                }
+                            }
+                        }
+                        
+                        let shareImageView = ComplimentShareView(date: dailyCompliment.date, sentence: dailyCompliment.compliment.title)
+                        
+                        if let swiftUIImage = shareImageView.snapshotImage() {
+                            let photo = SharePhoto(image: swiftUIImage, caption: "오늘의 칭찬")
+                            ShareLink(
+                                item: photo,
+                                preview: SharePreview(
+                                    photo.caption,
+                                    image: photo.image
+                                )
+                            ) {
+                                Image("Send Default")
+                            }
                         }
                     }
                 }
                 
                 Spacer()
+                
+                if toastManager.isShowing {
+                    ToastView(message: toastManager.message)
+                        .padding(.bottom, 22)
+                }
             }
             .padding(.horizontal, 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .task {
+                // && 오늘의 칭찬 확인하지 않은 경우
+                let isToday = calendarViewModel.isSameDay(date1: calendarViewModel.selectDate, date2: calendarViewModel.today)
+                
+                if isToday {
+                    toastManager.show(message: "글자를 눌러 직접 입력해 보세요")
+                }
+            }
+        }
+    }
+}
+
+struct YearHeaderView: View {
+    let date: Date
+    
+    var body: some View {
+        VStack {
+            Text(yearString(date: date))
+                .font(.suite(.bold, size: 17))
+                .foregroundStyle(Color.gray8)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 18)
+                .padding(.bottom, 15)
         }
     }
     
-    @MainActor
-    func snapshotCardImage<Content: View>(
-        _ content: Content,
-        size: CGSize = .init(width: 335, height: 498),
-        scale: CGFloat = 3.0
-    ) -> Image? {
-        let card = content
-            .frame(width: size.width, height: size.height)
-
-        let r = ImageRenderer(content: card)
-        r.proposedSize = .init(width: size.width, height: size.height)
-        r.scale = scale
-        r.isOpaque = false
-
-        guard let ui = r.uiImage else { return nil }
-        return Image(uiImage: ui)
+    private func yearString(date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy년"
+        return formatter.string(from: date)
     }
 }
 
 struct FlowerView: View {
+    let date: Date
+    
     var body: some View {
         VStack {
             Image("flower")
@@ -135,10 +144,10 @@ struct FlowerView: View {
                 .frame(height: 260)
                 .overlay(
                     VStack {
-                        Text("August")
+                        Text(monthString(date: date))
                             .font(.suite(.bold, size: 17))
                             .foregroundStyle(Color.gray6)
-                        Text("09")
+                        Text(dayString(date: date))
                             .font(.suite(.heavy, size: 128))
                             .foregroundStyle(Color.gray10)
                     },
@@ -146,6 +155,19 @@ struct FlowerView: View {
                 )
                 .padding(.top, 43)
         }
+    }
+    
+    private func monthString(date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateFormat = "MMMM"
+        return formatter.string(from: date)
+    }
+    
+    private func dayString(date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd"
+        return formatter.string(from: date)
     }
 }
 
@@ -175,15 +197,38 @@ struct ComplimentTextView: View {
     }
 }
 
-struct Photo: Transferable {
+struct ComplimentShareView: View {
+    let date: Date
+    let sentence: String
+    
+    var body: some View {
+        VStack(spacing: 26) {
+            FlowerView(date: date)
+            
+            VStack(spacing: 28) {
+                ComplimentTextView(sentence: sentence)
+                Image("logo home")
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 17)
+        .padding(.vertical, 25)
+        .background(Color.pink2)
+        .padding(.bottom, 15)
+        .overlay(
+            Image("Character Pink Stiker L")
+                .padding(.top, 25)
+                .padding(.leading, 17),
+            alignment: .topLeading
+        )
+    }
+}
+
+struct SharePhoto: Transferable {
     static var transferRepresentation: some TransferRepresentation {
         ProxyRepresentation(exporting: \.image)
     }
     
     public var image: Image
     public var caption: String
-}
-
-#Preview {
-    TodayComplimentView()
 }

@@ -28,6 +28,7 @@ enum CalendarMode: String, CaseIterable, CustomStringConvertible {
 @MainActor
 final class CalendarViewModel: ObservableObject {
     let calendar = Calendar.current
+    let today = Calendar.current.startOfDay(for: Date())
     @Published var selectDate: Date = Date()
     @Published var monthDates: [CalendarDate] = []
     @Published var weekDates: [CalendarDate] = [] // 선택한 주에 들어있는 날짜들
@@ -174,8 +175,6 @@ final class CalendarViewModel: ObservableObject {
     
     // 날짜 상태 판별
     func state(for date: Date, in month: Date) -> DateState {
-        let today = calendar.startOfDay(for: Date())
-        
         guard calendar.isDate(date, equalTo: month, toGranularity: .month) else {
             return .outsideMonth
         }
@@ -185,5 +184,9 @@ final class CalendarViewModel: ObservableObject {
         }
         
         return date < today ? .past : .future
+    }
+    
+    func isSameDay(date1: Date, date2: Date) -> Bool {
+        return calendar.isDate(date1, inSameDayAs: date2)
     }
 }
