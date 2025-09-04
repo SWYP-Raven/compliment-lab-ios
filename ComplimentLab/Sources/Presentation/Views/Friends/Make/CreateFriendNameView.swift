@@ -1,18 +1,19 @@
 //
-//  ProfileSetupView.swift
+//  CreateFriendNameView.swift
 //  ComplimentLab
 //
-//  Created by CatSlave on 8/24/25.
+//  Created by CatSlave on 9/1/25.
 //
 
 import SwiftUI
 
-struct ProfileSetupView: View {
-    @ObservedObject var profileSetupViewModel: ProfileSetupViewModel
+struct CreateFriendNameView: View {
+    let friendType: FriendType
     @StateObject private var toastManager = ToastManager()
-    @State private var nickname: String = ""
+    @Binding var friendName: String
+    @Binding var showCompleteView: Bool
     @State private var showToast = false
-    @State private var navigateToMain = false
+    @State private var navigateToCompleteView = false
     @FocusState private var isTextFieldFocused: Bool
     
     private let maxLength = 10
@@ -20,14 +21,14 @@ struct ProfileSetupView: View {
     var body: some View {
         VStack(spacing: 0) {
 
-            Text("닉네임을 입력해주세요")
+            Text("칭구의 별명을 지어주세요")
                 .font(.suite(.semiBold, size: 24))
                 .foregroundColor(.pink3)
-                .padding(.top, 90)
+                .padding(.top, 60)
                 .padding(.bottom, 48)
             
             ZStack(alignment: .leading) {
-                if nickname.isEmpty {
+                if friendName.isEmpty {
                     Text("10글자 이내로 설정해주세요")
                         .font(.suite(.bold, size: 17))
                         .foregroundColor(.gray4)
@@ -36,20 +37,20 @@ struct ProfileSetupView: View {
                 }
                 
                 HStack {
-                    TextField("", text: $nickname)
+                    TextField("", text: $friendName)
                         .font(.suite(.bold, size: 17))
                         .foregroundColor(.gray8)
-                        .onChange(of: nickname, { _, newValue in
+                        .onChange(of: friendName, { _, newValue in
                             if newValue.count > maxLength {
-                                nickname = String(newValue.prefix(maxLength))
+                                friendName = String(newValue.prefix(maxLength))
                                 toastManager.show(message: "닉네임은 최대 10글자예요")
                             }
                         })
                         .focused($isTextFieldFocused)
                     
-                    if !nickname.isEmpty {
+                    if !friendName.isEmpty {
                         Button(action: {
-                            nickname = ""
+                            friendName = ""
                         }) {
                             Image(.xDefault)
                                 .resizable()
@@ -74,20 +75,22 @@ struct ProfileSetupView: View {
             Spacer()
 
             Button(action: {
-                profileSetupViewModel.requestSetProfile(name: nickname)
+                withAnimation(.none) {
+                    showCompleteView = true
+                }
             }) {
-                Text("칭찬연구소 입장하기")
+                Text("칭구 만나기")
                     .font(.suite(.bold, size: 17))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
                     .background(
                         RoundedRectangle(cornerRadius: 14)
-                            .fill(nickname.isEmpty ? Color.blue3 : Color.blue4)
+                            .fill(friendName.isEmpty ? Color.blue3 : Color.blue4)
                     )
                     .padding(.horizontal, 20)
             }
-            .disabled(nickname.isEmpty)
+            .disabled(friendName.isEmpty)
             .padding(.bottom, 16)
         }
         .toolbarVisibility(.hidden, for: .navigationBar)
@@ -97,17 +100,5 @@ struct ProfileSetupView: View {
         }
         .background(Color.white)
         .toast(manager: toastManager)
-        .onReceive(profileSetupViewModel.$completed) { completed in
-            guard completed != nil else { return }
-            navigateToMain = true
-        }
-        .fullScreenCover(isPresented: $navigateToMain) {
-            CustomTabView()
-        }
     }
 }
-
-#Preview {
-    ProfileSetupView(profileSetupViewModel: .init())
-}
-
