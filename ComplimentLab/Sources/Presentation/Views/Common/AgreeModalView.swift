@@ -14,11 +14,13 @@ struct AgreeModalView<Content: View>: View {
     @State private var backgroundOpacity: Double = 0
     @State private var contentOffset: CGFloat = UIScreen.main.bounds.height
     @State private var isDragging = false
+    @Binding var isPresented: Bool  
     
     private let dismissThreshold: CGFloat = 200
     private let velocityThreshold: CGFloat = 500
     
-    init(@ViewBuilder content: () -> Content) {
+    init(isPresented: Binding<Bool>, @ViewBuilder content: () -> Content) {
+        self._isPresented = isPresented
         self.content = content()
     }
     
@@ -99,6 +101,8 @@ struct AgreeModalView<Content: View>: View {
         withAnimation(.easeIn(duration: 0.33)) {
             backgroundOpacity = 0
             contentOffset = UIScreen.main.bounds.height
+        } completion: {
+            isPresented = false
         }
     }
 }

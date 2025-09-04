@@ -6,12 +6,14 @@ public struct ContentView: View {
     public init() {}
 
     public var body: some View {
-        if isActive {
-            #warning("메인 화면 or 온보딩")
-            OnboardingView()
-        } else {
-            PinkGradientSplashView(isActive: $isActive)
-        }
+        PinkGradientSplashView(isActive: $isActive)
+            .fullScreenCover(isPresented: $isActive) {
+                if KeychainStorage.shared.hasToken() {
+                    CustomTabView()
+                } else {
+                    LoginView(loginViewModel: LoginViewModel())
+                }
+            }
     }
 }
 

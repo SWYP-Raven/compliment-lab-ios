@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ProfileSetupView: View {
+    @ObservedObject var profileSetupViewModel: ProfileSetupViewModel
     @StateObject private var toastManager = ToastManager()
     @State private var nickname: String = ""
     @State private var showToast = false
@@ -73,8 +74,7 @@ struct ProfileSetupView: View {
             Spacer()
 
             Button(action: {
-                // 회원가입 API 응답완료 뒤 시점으로 변경
-                navigateToMain = true
+                profileSetupViewModel.requestSetProfile(name: nickname)
             }) {
                 Text("청천연구소 입장하기")
                     .font(.suite(.bold, size: 17))
@@ -97,13 +97,17 @@ struct ProfileSetupView: View {
         }
         .background(Color.white)
         .toast(manager: toastManager)
+        .onReceive(profileSetupViewModel.$completed) { completed in
+            guard completed != nil else { return }
+            navigateToMain = true
+        }
         .fullScreenCover(isPresented: $navigateToMain) {
-                    CustomTabView()
-                }
+            CustomTabView()
+        }
     }
 }
 
 #Preview {
-    ProfileSetupView()
+    ProfileSetupView(profileSetupViewModel: .init())
 }
 

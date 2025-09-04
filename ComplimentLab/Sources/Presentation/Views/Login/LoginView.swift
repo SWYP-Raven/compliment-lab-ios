@@ -8,14 +8,15 @@
 import SwiftUI
 import AuthenticationServices
 
-struct OnboardingView: View {
+struct LoginView: View {
+    @ObservedObject var loginViewModel: LoginViewModel
     @State private var currentPage = 0
+    @State private var appleLoginCoordinator = AppleLoginManager()
+    @State private var showAgreeView: Bool = false
+    @State private var naviToProfileEdit = false
+    @State private var navigateToMain = false
     private let totalPages = 3
     private var isLogin: Bool { currentPage == 2 }
-    
-    @State private var appleLoginCoordinator = AppleLoginCoordinator()
-    @State private var showAgreeView = false
-    @State private var naviToProfileEdit = false
     
     var body: some View {
         NavigationStack {
@@ -23,21 +24,31 @@ struct OnboardingView: View {
                 onboardingContent
 
                 if showAgreeView {
-                    AgreeModalView() {
+                    AgreeModalView(isPresented: $showAgreeView) {
                         AgreementView(onAgreementCompleted: {
                             naviToProfileEdit = true
                         })
                     }
                 }
             }
-            .onReceive(appleLoginCoordinator.$logged) { logined in
-                guard logined != nil else { return }
-                showAgreeView = true
+            .onReceive(appleLoginCoordinator.$token) { token in
+                guard let token else { return }
+                loginViewModel.loginWithApple(identityToken: token)
+            }
+            .onReceive(loginViewModel.$isSignup) { isSignup in
+                guard let isSignup else { return }
+                if isSignup {
+                    navigateToMain = true
+                } else {
+                    naviToProfileEdit = true
+                }
             }
             .navigationDestination(isPresented: $naviToProfileEdit) {
-                ProfileSetupView()
+                ProfileSetupView(profileSetupViewModel: .init())
             }
-            
+        }
+        .fullScreenCover(isPresented: $navigateToMain) {
+            CustomTabView()
         }
         .toolbarVisibility(.hidden, for: .navigationBar)
     }
@@ -62,7 +73,6 @@ struct OnboardingView: View {
             
             Spacer()
             
-            // 페이지 뷰
             TabView(selection: $currentPage) {
                 OnboardingPageView(
                     title: "칭찬을 보아요",
@@ -168,7 +178,7 @@ struct OnboardingPageView: View {
 }
 
 #Preview {
-    OnboardingView()
+    LoginView(loginViewModel: LoginViewModel())
 }
 
 
