@@ -40,10 +40,11 @@ class ToastManager: ObservableObject {
 // MARK: - Toast View
 struct ToastView: View {
     let message: String
+    let imageTitle: String
     
     var body: some View {
         HStack(spacing: 12) {
-            Image(.checkNagativeToast)
+            Image(imageTitle)
             
             Text(message)
                 .font(.suite(.semiBold, size: 15))
@@ -71,7 +72,7 @@ struct ToastModifier: ViewModifier {
             
             if toastManager.isShowing {
                 VStack {
-                    ToastView(message: toastManager.message)
+                    ToastView(message: toastManager.message, imageTitle: "Check Nagative Toast")
                         .transition(.opacity.combined(with: .scale(scale: 0.95)))
                         .padding(.top, 6)
                         .padding(.horizontal, 20)

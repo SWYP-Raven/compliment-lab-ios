@@ -88,7 +88,7 @@ struct CalendarView: View {
             }
             
             if toastManager.isShowing {
-                ToastView(message: toastManager.message)
+                ToastView(message: toastManager.message, imageTitle: "Check Toast")
             }
         }
         .padding(.horizontal, 20)
@@ -117,6 +117,9 @@ struct CalendarView: View {
                 calendarViewModel.weekDates = calendarViewModel.getWeekDate(for: calendarViewModel.week)
                 complimentViewModel.fetchWeeklyCompliment(weekDates: calendarViewModel.weekDates)
             }
+//            
+//            let vm = LoginViewModel()
+//            vm.logout()
         }
     }
 }

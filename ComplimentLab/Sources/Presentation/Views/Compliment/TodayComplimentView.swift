@@ -96,7 +96,7 @@ struct TodayComplimentView: View {
                 Spacer()
                 
                 if toastManager.isShowing {
-                    ToastView(message: toastManager.message)
+                    ToastView(message: toastManager.message, imageTitle: "Check Toast")
                         .padding(.bottom, 22)
                 }
             }
