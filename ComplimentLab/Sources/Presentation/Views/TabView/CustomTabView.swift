@@ -10,7 +10,9 @@ import SwiftUI
 struct CustomTabView: View {
     @StateObject var calendarViewModel = CalendarViewModel()
     @StateObject var complimentViewModel = ComplimentViewModel(useCase: ComplimentAPI())
+    @StateObject var friendsViewModel = FriendsViewModel()
     @State private var selection = 0
+    @State private var showCreateFriends = false
     
     init() {
         UITabBarItem.appearance().setTitleTextAttributes([
@@ -35,7 +37,8 @@ struct CustomTabView: View {
                         }
                         .tag(0)
                     
-                    Color.clear
+                    FriendsView(friendsViewModel: friendsViewModel,
+                                showCreateFriends: $showCreateFriends)
                         .tabItem {
                             selection == 1 ? Image("Chat Pressed") : Image("Chat Default")
                             Text("칭구")

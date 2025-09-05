@@ -34,10 +34,18 @@ extension Color {
     
     static let violet1 = Color("violet1")
     static let violet2 = Color("violet2")
+    static let violet3 = Color("violet3")
+    static let violet4 = Color("violet4")
     
     static let yellow1 = Color("yellow1")
     static let yellow2 = Color("yellow2")
+    static let yellow3 = Color("yellow3")
+    static let yellow4 = Color("yellow4")
     
     static let green1 = Color("green1")
     static let green2 = Color("green2")
+    static let green3 = Color("green3")
+    static let green4 = Color("green4")
+    
+    static let orange4 = Color("orange4")
 }
