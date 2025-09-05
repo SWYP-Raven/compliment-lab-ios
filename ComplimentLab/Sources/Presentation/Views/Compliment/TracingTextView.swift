@@ -143,5 +143,5 @@ struct TracingTextView: View {
 }
 
 #Preview {
-    TracingTextView(viewModel: ComplimentViewModel(), toastManager: ToastManager(), sentence: "")
+    TracingTextView(viewModel: ComplimentViewModel(useCase: ComplimentAPI()), toastManager: ToastManager(), sentence: "")
 }

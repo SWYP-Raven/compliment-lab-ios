@@ -21,7 +21,7 @@ struct HandCopyingSuccessView: View {
                         Text("필사 완료")
                         
                         VStack(alignment: .leading, spacing: 12) {
-                            Text(dailyCompliment.compliment.title)
+                            Text(dailyCompliment.compliment.content)
                                 .font(.suite(.semiBold, size: 15))
                                 .lineLimit(1)
                             ExDivider()
@@ -34,7 +34,9 @@ struct HandCopyingSuccessView: View {
                         Spacer()
                         
                         Button {
+                            let changedArchived = !dailyCompliment.isArchived
                             complimentViewModel.toggleArchive()
+                            complimentViewModel.patchCompliment(isArchived: changedArchived, isRead: dailyCompliment.isRead, date: dailyCompliment.date)
                         } label: {
                             ZStack {
                                 Image("Flower Default Default")
@@ -46,7 +48,7 @@ struct HandCopyingSuccessView: View {
                             }
                         }
                         
-                        let shareImageView = ComplimentShareView(date: dailyCompliment.date, sentence: dailyCompliment.compliment.title)
+                        let shareImageView = ComplimentShareView(date: dailyCompliment.date, sentence: dailyCompliment.compliment.content)
                         
                         if let swiftUIImage = shareImageView.snapshotImage() {
                             let photo = SharePhoto(image: swiftUIImage, caption: "오늘의 칭찬")

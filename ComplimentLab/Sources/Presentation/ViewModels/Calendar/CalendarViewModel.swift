@@ -120,21 +120,18 @@ final class CalendarViewModel: ObservableObject {
         }
     }
     
-    // 캘린더 헤더 년월 포멧
-    func yearMonthDateFormatter(in date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy년 MMMM"
-        formatter.locale = Locale(identifier: "ko_KR")
-        
-        return formatter.string(from: date)
-    }
-    
     // 달 변경 (주간 달력 모드에서 달이 바뀌면 해당 달의 1일로 주를 초기화)
     func changeMonth(by value: Int) {
         if let newMonth = calendar.date(byAdding: .month, value: value, to: month) {
             self.month = newMonth
             
             var components = calendar.dateComponents([.year, .month], from: newMonth)
+            
+            if let y = components.year, let m = components.month {
+                self.selectedYear = y
+                self.selectedMonth = m
+            }
+            
             components.day = 1
             
             if let firstWeekOfMonth = calendar.date(from: components) {
@@ -169,6 +166,11 @@ final class CalendarViewModel: ObservableObject {
             
             if newMonthComponent.month != oldMonthComponent.month {
                 self.month = newWeek
+                
+                if let y = newMonthComponent.year, let m = newMonthComponent.month {
+                    self.selectedYear = y
+                    self.selectedMonth = m
+                }
             }
         }
     }

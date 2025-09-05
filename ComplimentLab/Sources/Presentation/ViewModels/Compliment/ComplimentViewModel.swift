@@ -6,15 +6,66 @@
 //
 
 import Foundation
+import RxSwift
 
 final class ComplimentViewModel: ObservableObject {
+    @Published var complimentList: [DailyCompliment] = []
     @Published var dailyCompliment: DailyCompliment?
     @Published var copyingSuccess: Bool = false
     @Published var flowerPressed: Bool = false
+    
+    let useCase: ComplimentUseCase
+    let disposeBag = DisposeBag()
+    
     let sentence: String = "오늘도 한 발자국 나아갔네요.\n그 걸음이 모여 더 큰 변화를 만들 거예요!"
     
     func toggleArchive() {
         dailyCompliment?.isArchived.toggle()
+    }
+    
+    init(useCase: ComplimentUseCase) {
+        self.useCase = useCase
+    }
+    
+    func fetchMonthlyCompliment(year: Int, month: Int) {
+        let date = "\(year)-\(String(format: "%02d", month))"
+        
+        useCase.getMonthlyCompliment(date: date)
+            .subscribe(onNext: { [weak self] items in
+                self?.complimentList = items
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func fetchWeeklyCompliment(weekDates: [CalendarDate]) {
+        guard let start = weekDates.first?.date, let end = weekDates.last?.date else { return }
+        
+        useCase.getWeeklyCompliment(
+            startDate: DateFormatterManager.shared.apiDate(from: start),
+            endDate: DateFormatterManager.shared.apiDate(from: end)
+        )
+        .subscribe(onNext: { [weak self] items in
+            self?.complimentList = items
+        })
+        .disposed(by: disposeBag)
+    }
+    
+    func patchCompliment(isArchived: Bool, isRead: Bool, date: Date) {
+        let editComplimentDTO = EditComplimentDTO(isArchived: isArchived, isRead: isRead)
+        
+        useCase.patchCompliment(
+            editComplimentDTO: editComplimentDTO,
+            date: DateFormatterManager.shared.apiDate(from: date)
+        )
+            .subscribe(
+                onNext: {
+                    print("PATCH 성공!")
+                },
+                onError: { error in
+                    print("PATCH 실패: \(error)")
+                }
+            )
+            .disposed(by: disposeBag)
     }
     
     // 한글 완성형 분해: (초/중/종) 인덱스

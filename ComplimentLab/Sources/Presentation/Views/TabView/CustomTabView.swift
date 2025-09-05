@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CustomTabView: View {
     @StateObject var calendarViewModel = CalendarViewModel()
-    @StateObject var complimentViewModel = ComplimentViewModel()
+    @StateObject var complimentViewModel = ComplimentViewModel(useCase: ComplimentAPI())
     @State private var selection = 0
     
     init() {

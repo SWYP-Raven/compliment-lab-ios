@@ -30,14 +30,14 @@ struct TodayComplimentView: View {
                                 NavigationLink {
                                     HandCopyingView(complimentViewModel: complimentViewModel)
                                 } label: {
-                                    ComplimentTextView(sentence: dailyCompliment.compliment.title)
+                                    ComplimentTextView(sentence: dailyCompliment.compliment.content)
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             } else {
                                 Button {
                                     toastManager.show(message: "앗, 오늘의 칭찬만 따라 쓸 수 있어요")
                                 } label: {
-                                    ComplimentTextView(sentence: dailyCompliment.compliment.title)
+                                    ComplimentTextView(sentence: dailyCompliment.compliment.content)
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
@@ -62,7 +62,9 @@ struct TodayComplimentView: View {
                         Spacer()
                         
                         Button {
+                            let changedArchived = !dailyCompliment.isArchived
                             complimentViewModel.toggleArchive()
+                            complimentViewModel.patchCompliment(isArchived: changedArchived, isRead: dailyCompliment.isRead, date: dailyCompliment.date)
                         } label: {
                             ZStack {
                                 Image("Flower Default Default")
@@ -74,7 +76,7 @@ struct TodayComplimentView: View {
                             }
                         }
                         
-                        let shareImageView = ComplimentShareView(date: dailyCompliment.date, sentence: dailyCompliment.compliment.title)
+                        let shareImageView = ComplimentShareView(date: dailyCompliment.date, sentence: dailyCompliment.compliment.content)
                         
                         if let swiftUIImage = shareImageView.snapshotImage() {
                             let photo = SharePhoto(image: swiftUIImage, caption: "오늘의 칭찬")
@@ -117,19 +119,13 @@ struct YearHeaderView: View {
     
     var body: some View {
         VStack {
-            Text(yearString(date: date))
+            Text(DateFormatterManager.shared.year(from: date))
                 .font(.suite(.bold, size: 17))
                 .foregroundStyle(Color.gray8)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 18)
                 .padding(.bottom, 15)
         }
-    }
-    
-    private func yearString(date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy년"
-        return formatter.string(from: date)
     }
 }
 
@@ -144,10 +140,10 @@ struct FlowerView: View {
                 .frame(height: 260)
                 .overlay(
                     VStack {
-                        Text(monthString(date: date))
+                        Text(DateFormatterManager.shared.monthEnglish(from: date))
                             .font(.suite(.bold, size: 17))
                             .foregroundStyle(Color.gray6)
-                        Text(dayString(date: date))
+                        Text(DateFormatterManager.shared.day(from: date))
                             .font(.suite(.heavy, size: 128))
                             .foregroundStyle(Color.gray10)
                     },
@@ -155,19 +151,6 @@ struct FlowerView: View {
                 )
                 .padding(.top, 43)
         }
-    }
-    
-    private func monthString(date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US")
-        formatter.dateFormat = "MMMM"
-        return formatter.string(from: date)
-    }
-    
-    private func dayString(date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd"
-        return formatter.string(from: date)
     }
 }
 

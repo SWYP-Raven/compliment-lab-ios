@@ -106,7 +106,7 @@ struct HandCopyingView: View {
                     VStack(spacing: 26) {
                         Image("Character Pink Stiker L")
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        TracingTextView(viewModel: complimentViewModel, toastManager: toastManager, sentence: dailyCompliment.compliment.title)
+                        TracingTextView(viewModel: complimentViewModel, toastManager: toastManager, sentence: dailyCompliment.compliment.content)
                         Image("logo home")
                     }
                     .frame(maxWidth: .infinity)
@@ -136,11 +136,5 @@ struct HandCopyingView: View {
                 }
             }
         }
-    }
-    
-    private func yearString(date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy년"
-        return formatter.string(from: date)
     }
 }
