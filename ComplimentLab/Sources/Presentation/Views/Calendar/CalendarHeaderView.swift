@@ -16,7 +16,7 @@ struct CalendarHeaderView: View {
                 calendarViewModel.shouldShowMonthPicker = true
             } label: {
                 HStack(spacing: 2) {
-                    Text(calendarViewModel.yearMonthDateFormatter(in: calendarViewModel.month))
+                    Text(DateFormatterManager.shared.yearMonth(from: calendarViewModel.month))
                         .font(.suite(.bold, size: 17))
                         .foregroundStyle(Color.gray8)
                     

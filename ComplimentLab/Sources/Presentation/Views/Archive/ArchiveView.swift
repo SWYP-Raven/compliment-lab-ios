@@ -48,7 +48,7 @@ struct DailyCalendarArchive: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             LazyVStack {
-                ForEach($archiveViewModel.dailyCompliments) { $dailyCompliment in
+                ForEach($archiveViewModel.dailyCompliments, id: \.self) { $dailyCompliment in
                     NavigationLink(destination: TodayComplimentView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel)) {
                         VStack(alignment: .leading, spacing: 22) {
                             HStack(alignment: .center) {
@@ -59,12 +59,12 @@ struct DailyCalendarArchive: View {
                                     )
                                 
                                 Spacer()
-                                Text(changeDateFormat(date: dailyCompliment.date))
+                                Text(DateFormatterManager.shared.dayOfWeek(from: dailyCompliment.date))
                                     .font(.suite(.medium, size: 12))
                                     .foregroundStyle(Color.gray4)
                                 
                                 Button {
-                                    archiveViewModel.toggleArchive(id: dailyCompliment.id)
+//                                    archiveViewModel.toggleArchive(id: dailyCompliment.id)
                                 } label: {
                                     ZStack {
                                         Image("Flower Default Default")
@@ -76,7 +76,7 @@ struct DailyCalendarArchive: View {
                                 }
                             }
                             
-                            Text("\(dailyCompliment.compliment.title)")
+                            Text("\(dailyCompliment.compliment.content)")
                                 .font(.suite(.medium, size: 14))
                                 .foregroundStyle(Color.gray9)
                         }
@@ -95,15 +95,6 @@ struct DailyCalendarArchive: View {
             }
         }
     }
-    
-    private func changeDateFormat(date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ko_KR")
-        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
-        formatter.dateFormat = "d EEEE"
-        
-        return formatter.string(from: date)
-    }
 }
 
 struct ArchiveHeaderView: View {
@@ -116,7 +107,7 @@ struct ArchiveHeaderView: View {
                 calendarViewModel.shouldShowMonthPicker = true
             } label: {
                 HStack(spacing: 2) {
-                    Text(calendarViewModel.yearMonthDateFormatter(in: calendarViewModel.month))
+                    Text(DateFormatterManager.shared.yearMonth(from: calendarViewModel.month))
                         .font(.suite(.bold, size: 17))
                         .foregroundStyle(Color.gray8)
                     

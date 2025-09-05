@@ -41,7 +41,7 @@ struct NoticeView: View {
                                 .font(.suite(.medium, size: 15))
                                 .foregroundStyle(Color.gray8)
                             
-                            Text(changeDateFormat(date: notice.createdAt))
+                            Text(DateFormatterManager.shared.dottedDate(from: notice.createdAt))
                                 .font(.suite(.medium, size: 12))
                                 .foregroundStyle(Color.gray6)
                         }
@@ -51,15 +51,6 @@ struct NoticeView: View {
             }
         }
         .padding(.horizontal, 20)
-    }
-    
-    private func changeDateFormat(date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ko_KR")
-        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
-        formatter.dateFormat = "yyyy.MM.dd"
-        
-        return formatter.string(from: date)
     }
 }
 
