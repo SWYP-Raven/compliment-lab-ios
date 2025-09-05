@@ -13,6 +13,7 @@ struct FriendCreationView: View {
     @State private var selectedType: FriendType?
     @State private var showCompleteView = false
     @State private var friendName = ""
+    @Environment(\.dismiss) var dismiss
     let totalPages = 2
     
     var body: some View {
@@ -27,45 +28,6 @@ struct FriendCreationView: View {
                 .transition(.identity)
             } else {
                 VStack(spacing: 0) {
-                    HStack {
-                        Button(action: {
-                            if currentPage == 0 {
-                                showCreateFriends = false
-                            } else {
-                                currentPage = 0
-                            }
-                        }) {
-                            Image("Arrow left Default")
-                                .resizable()
-                                .frame(width: 24, height: 24)
-                        }
-                        
-                        Spacer()
-                        
-                        HStack(spacing: 10) {
-                            ForEach(0..<totalPages, id: \.self) { index in
-                                if index == currentPage {
-                                    Capsule()
-                                        .fill(Color.blue4)
-                                        .frame(width: 41, height: 9)
-                                        .animation(.easeInOut, value: currentPage)
-                                } else {
-                                    Circle()
-                                        .fill(Color.blue2)
-                                        .frame(width: 9, height: 9)
-                                }
-                            }
-                        }
-                        
-                        Spacer()
-                        
-                        Rectangle()
-                            .fill(Color.clear)
-                            .frame(width: 24, height: 24)
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 16)
-                    
                     if currentPage == 0 {
                         CreateFriendTypeView(selectedType: $selectedType) {
                             currentPage = 1
@@ -81,6 +43,34 @@ struct FriendCreationView: View {
                 .background(Color.white)
             }
         }
+        .customNavigationBar(
+            centerView: {
+                if !showCompleteView {
+                    HStack(spacing: 10) {
+                        ForEach(0..<totalPages, id: \.self) { index in
+                            if index == currentPage {
+                                Capsule()
+                                    .fill(Color.blue4)
+                                    .frame(width: 41, height: 9)
+                                    .animation(.easeInOut, value: currentPage)
+                            } else {
+                                Circle()
+                                    .fill(Color.blue2)
+                                    .frame(width: 9, height: 9)
+                            }
+                        }
+                    }
+                }
+            },
+            leftView: {
+                Button {
+                    dismiss()
+                } label: {
+                    Image("Arrow left Default")
+                }
+            },
+            overlay: showCompleteView
+        )
     }
 }
 

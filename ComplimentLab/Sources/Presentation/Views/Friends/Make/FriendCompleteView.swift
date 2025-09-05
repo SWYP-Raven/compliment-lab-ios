@@ -22,33 +22,6 @@ struct FriendCompleteView: View {
                 .ignoresSafeArea(.all)
             
             VStack(spacing: 0) {
-                // 상단 네비게이션
-                HStack {
-                    // 뒤로가기 버튼
-                    Button(action: {
-                        showCompleteView = false
-                    }) {
-                        Image(.arrowLeftDefault)
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                    }
-                    
-                    Spacer()
-                    
-                    // X 버튼
-                    Button(action: {
-                        showCreateFriends = false
-                    }) {
-                        Image(.xNormalDefault)
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                    }
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 16)
-                
-                Spacer()
-                
                 // 캐릭터 이미지
                 Image(characterImageName)
                     .resizable()
