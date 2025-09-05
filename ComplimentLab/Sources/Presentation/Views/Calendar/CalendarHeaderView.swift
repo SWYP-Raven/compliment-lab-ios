@@ -66,7 +66,9 @@ struct NavigateToFriendView: View {
             Image("Character Pink half")
             
             VStack(alignment: .leading) {
-                Text("Username님,")
+                let username = UserDefaults.standard.string(forKey: "username") ?? ""
+                
+                Text("\(username)님,")
                     .font(.suite(.bold, size: 17))
                     .foregroundColor(Color.blue4)
                 

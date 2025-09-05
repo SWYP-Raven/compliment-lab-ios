@@ -113,7 +113,9 @@ struct SettingNicknameView: View {
                 .foregroundStyle(Color.gray6)
             
             HStack {
-                Text("나의닉네임")
+                let username = UserDefaults.standard.string(forKey: "username") ?? ""
+                
+                Text("\(username)")
                     .font(.suite(.semiBold, size: 24))
                     .foregroundStyle(Color.gray8)
                 
