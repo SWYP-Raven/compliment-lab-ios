@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct NoticeView: View {
+    @Environment(\.dismiss) var dismiss
     let notices: [Notice] = [
         Notice(
             id: UUID().uuidString,
@@ -50,7 +51,17 @@ struct NoticeView: View {
                 }
             }
         }
+        .padding(.top, 40)
         .padding(.horizontal, 20)
+        .customNavigationBar(
+            leftView: {
+                Button {
+                    dismiss()
+                } label: {
+                    Image("Arrow left Default")
+                }
+            }
+        )
     }
 }
 

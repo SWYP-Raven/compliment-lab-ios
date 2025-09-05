@@ -10,7 +10,7 @@ import SwiftUI
 struct HandCopyingView: View {
     @ObservedObject var complimentViewModel: ComplimentViewModel
     @StateObject private var toastManager = ToastManager()
-//    @Binding var dailyCompliment: DailyCompliment
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         ZStack {
@@ -45,6 +45,15 @@ struct HandCopyingView: View {
                 }
                 .padding(.horizontal, 20)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .customNavigationBar(
+                    leftView: {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image("Arrow left Default")
+                        }
+                    }
+                )
             }
             
             if complimentViewModel.copyingSuccess {

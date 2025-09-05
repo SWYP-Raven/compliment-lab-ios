@@ -38,7 +38,6 @@ struct CustomNavigationBarModifier<C: View, L: View, R: View>: ViewModifier {
                 VStack(spacing: 18) {
                     navBar
                     content
-                    Spacer()
                 }
             }
         }

@@ -11,6 +11,7 @@ struct TodayComplimentView: View {
     @StateObject private var toastManager = ToastManager()
     @ObservedObject var calendarViewModel: CalendarViewModel
     @ObservedObject var complimentViewModel: ComplimentViewModel
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         ZStack {
@@ -123,6 +124,15 @@ struct TodayComplimentView: View {
                         toastManager.show(message: "글자를 눌러 직접 입력해 보세요")
                     }
                 }
+                .customNavigationBar(
+                    leftView: {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image("Arrow left Default")
+                        }
+                    }
+                )
             }
         }
     }

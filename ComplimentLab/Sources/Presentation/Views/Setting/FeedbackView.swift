@@ -10,6 +10,7 @@ import SwiftUI
 struct FeedbackView: View {
     @State private var feedbackText: String = ""
     @State private var placeholder = "함께 만드는 칭찬연구소.\n의견은 50자 이내로 적어주세요."
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         VStack {
@@ -47,7 +48,7 @@ struct FeedbackView: View {
             
             Spacer()
             Button {
-                
+                dismiss()
             } label: {
                 Text("피드백 제보하기")
                     .font(.suite(.bold, size: 17))
@@ -63,6 +64,19 @@ struct FeedbackView: View {
         .padding(.horizontal, 20)
         .padding(.top, 40)
         .padding(.bottom, 16)
+        .customNavigationBar(
+            leftView: {
+                Button {
+                    dismiss()
+                } label: {
+                    Image("Arrow left Default")
+                }
+            }
+        )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            UIApplication.shared.endEditing(true)
+        }
     }
 }
 

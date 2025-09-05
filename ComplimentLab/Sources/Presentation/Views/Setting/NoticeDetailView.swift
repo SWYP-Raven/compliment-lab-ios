@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct NoticeDetailView: View {
+    @Environment(\.dismiss) var dismiss
     let notice: Notice
     
     var body: some View {
@@ -18,7 +19,21 @@ struct NoticeDetailView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             Spacer()
         }
+        .padding(.top, 40)
         .padding(.horizontal, 20)
-        .navigationTitle(notice.title)
+        .customNavigationBar(
+            centerView: {
+                Text(notice.title)
+                    .font(.suite(.medium, size: 15))
+                    .foregroundStyle(Color.gray8)
+            },
+            leftView: {
+                Button {
+                    dismiss()
+                } label: {
+                    Image("Arrow left Default")
+                }
+            }
+        )
     }
 }

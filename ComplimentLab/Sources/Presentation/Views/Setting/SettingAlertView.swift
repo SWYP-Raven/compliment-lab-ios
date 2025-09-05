@@ -10,6 +10,7 @@ import SwiftUI
 struct SettingAlertView: View {
     @State private var firstToggleStates: [Bool] = Array(repeating: false, count: 3)
     @State private var secondToggleStates: [Bool] = Array(repeating: false, count: 2)
+    @Environment(\.dismiss) var dismiss
     
     private let firstItems = ["일력 알림", "칭구 알림", "아카이브 알림"]
     private let secondItems = ["마케팅 활용 동의", "이벤트 혜택 알림"]
@@ -34,7 +35,17 @@ struct SettingAlertView: View {
             
             Spacer()
         }
+        .padding(.top, 40)
         .padding(.horizontal, 20)
+        .customNavigationBar(
+            leftView: {
+                Button {
+                    dismiss()
+                } label: {
+                    Image("Arrow left Default")
+                }
+            }
+        )
     }
 }
 
