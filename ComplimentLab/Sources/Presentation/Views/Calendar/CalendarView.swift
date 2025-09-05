@@ -117,7 +117,7 @@ struct CalendarView: View {
                 calendarViewModel.weekDates = calendarViewModel.getWeekDate(for: calendarViewModel.week)
                 complimentViewModel.fetchWeeklyCompliment(weekDates: calendarViewModel.weekDates)
             }
-//            
+            
 //            let vm = LoginViewModel()
 //            vm.logout()
         }
@@ -161,7 +161,7 @@ struct CalendarGridView: View {
         if let dailyCompliment = complimentViewModel.dailyCompliment {
             VStack(alignment: .leading) {
                 HStack {
-                    Image("Character Pink Stiker L")
+                    dailyCompliment.compliment.type.stickerLImage
                     Spacer()
                     Button {
                         let changedArchived = !dailyCompliment.isArchived
@@ -181,7 +181,7 @@ struct CalendarGridView: View {
             }
             .padding(.horizontal, 17)
             .padding(.vertical, 25)
-            .background(Color.pink1)
+            .background(dailyCompliment.compliment.type.color1)
             .clipShape(RoundedRectangle(cornerRadius: 15))
             .onTapGesture {
                 calendarViewModel.isButtonTapped = true
