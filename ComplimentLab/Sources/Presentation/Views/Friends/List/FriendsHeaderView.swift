@@ -7,6 +7,37 @@
 
 import SwiftUI
 
+struct FriendView: View {
+    let friends: [String] = []
+    @State private var showCreateFriends = true
+    
+    var body: some View {
+        if friends.isEmpty {
+            VStack {
+                Image("firendsEmpty")
+                Text("오늘부터 작은 긍정 하나\n칭구가 함께할게요!")
+                
+                NavigationLink(destination: FriendCreationView(showCreateFriends: $showCreateFriends)) {
+                    Text("칭구 만나러 가기")
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .foregroundColor(Color.gray0)
+                        .background(Color.blue4)
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding()
+        } else {
+            ScrollView {
+                LazyVStack {
+                    
+                }
+            }
+        }
+    }
+}
+
 struct HeaderImageView: View {
 
     let message: String

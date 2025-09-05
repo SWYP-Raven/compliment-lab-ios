@@ -36,9 +36,8 @@ struct CustomTabView: View {
                             Text("일력")
                         }
                         .tag(0)
-                    
-                    FriendsView(friendsViewModel: friendsViewModel,
-                                showCreateFriends: $showCreateFriends)
+
+                    FriendView()
                         .tabItem {
                             selection == 1 ? Image("Chat Pressed") : Image("Chat Default")
                             Text("칭구")
