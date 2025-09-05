@@ -14,17 +14,17 @@ struct HandCopyingView: View {
 
     var body: some View {
         ZStack {
-            Color.pink1.ignoresSafeArea()
-                .onTapGesture {
-                    UIApplication.shared.endEditing(true)
-                }
-            
-            VStack {
-                if let dailyCompliment = complimentViewModel.dailyCompliment {
+            if let dailyCompliment = complimentViewModel.dailyCompliment {
+                dailyCompliment.compliment.type.color1.ignoresSafeArea()
+                    .onTapGesture {
+                        UIApplication.shared.endEditing(true)
+                    }
+                
+                VStack {
                     YearHeaderView(date: dailyCompliment.date)
                     
                     VStack(spacing: 26) {
-                        Image("Character Pink Stiker L")
+                        dailyCompliment.compliment.type.stickerLImage
                             .frame(maxWidth: .infinity, alignment: .leading)
                         TracingTextView(viewModel: complimentViewModel, toastManager: toastManager, sentence: dailyCompliment.compliment.content)
                         Image("logo home")
@@ -32,7 +32,7 @@ struct HandCopyingView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal, 17)
                     .padding(.vertical, 25)
-                    .background(Color.pink2)
+                    .background(dailyCompliment.compliment.type.color2)
                     .clipShape(RoundedRectangle(cornerRadius: 15))
                     .padding(.bottom, 15)
                     
@@ -43,9 +43,9 @@ struct HandCopyingView: View {
                             .padding(.bottom, 22)
                     }
                 }
+                .padding(.horizontal, 20)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
-            .padding(.horizontal, 20)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             
             if complimentViewModel.copyingSuccess {
                 Color.backgroundGray

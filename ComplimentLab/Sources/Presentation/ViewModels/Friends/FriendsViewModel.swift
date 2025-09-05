@@ -6,13 +6,14 @@
 //
 
 import Foundation
+import SwiftUI
 
-enum FriendType: String, CaseIterable {
-    case kind
-    case energetic
-    case studious
-    case special
-    case quiet
+enum FriendType: String, CaseIterable, Codable {
+    case kind = "1"
+    case energetic = "2"
+    case studious = "3"
+    case special = "4"
+    case quiet = "5"
 
     var title: String {
         switch self {
@@ -41,6 +42,66 @@ enum FriendType: String, CaseIterable {
             return "\"너는 참 너답게 빛나.\""
         case .quiet:
             return "\"드디어 해냈구나\""
+        }
+    }
+    
+    var color1: Color {
+        switch self {
+        case .kind:
+            return Color.pink1
+        case .energetic:
+            return Color.blue1
+        case .studious:
+            return Color.green1
+        case .special:
+            return Color.yellow1
+        case .quiet:
+            return Color.violet1
+        }
+    }
+    
+    var color2: Color {
+        switch self {
+        case .kind:
+            return Color.pink2
+        case .energetic:
+            return Color.blue2
+        case .studious:
+            return Color.green2
+        case .special:
+            return Color.yellow2
+        case .quiet:
+            return Color.violet2
+        }
+    }
+    
+    var stickerSImage: Image {
+        switch self {
+        case .kind:
+            return Image("Character Pink Stiker S")
+        case .energetic:
+            return Image("Character Blue Stiker S")
+        case .studious:
+            return Image("Character Green Stiker S")
+        case .special:
+            return Image("Character Yellow Stiker S")
+        case .quiet:
+            return Image("Character Violet Stiker S")
+        }
+    }
+    
+    var stickerLImage: Image {
+        switch self {
+        case .kind:
+            return Image("Character Pink Stiker L")
+        case .energetic:
+            return Image("Character Blue Stiker L")
+        case .studious:
+            return Image("Character Green Stiker L")
+        case .special:
+            return Image("Character Yellow Stiker L")
+        case .quiet:
+            return Image("Character Violet Stiker L")
         }
     }
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CalendarView: View {
-    @EnvironmentObject var toastManager: ToastManager
+    @StateObject private var toastManager = ToastManager()
     @ObservedObject var calendarViewModel: CalendarViewModel
     @ObservedObject var complimentViewModel: ComplimentViewModel
     
@@ -30,13 +30,13 @@ struct CalendarView: View {
                 
                 if calendarViewModel.mode == .month {
                     TabView(selection: $page) {
-                        CalendarGridView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, dates: calendarViewModel.prevMonthDates)
+                        CalendarGridView(toastManager: toastManager, calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, dates: calendarViewModel.prevMonthDates)
                             .tag(0)
                         
-                        CalendarGridView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, dates: calendarViewModel.monthDates)
+                        CalendarGridView(toastManager: toastManager, calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, dates: calendarViewModel.monthDates)
                             .tag(1)
                         
-                        CalendarGridView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, dates: calendarViewModel.nextMonthDates)
+                        CalendarGridView(toastManager: toastManager, calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, dates: calendarViewModel.nextMonthDates)
                             .tag(2)
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
@@ -58,13 +58,13 @@ struct CalendarView: View {
                     }
                 } else {
                     TabView(selection: $page) {
-                        CalendarGridView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, dates: calendarViewModel.prevWeekDates)
+                        CalendarGridView(toastManager: toastManager, calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, dates: calendarViewModel.prevWeekDates)
                             .tag(0)
                         
-                        CalendarGridView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, dates: calendarViewModel.weekDates)
+                        CalendarGridView(toastManager: toastManager, calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, dates: calendarViewModel.weekDates)
                             .tag(1)
                         
-                        CalendarGridView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, dates: calendarViewModel.nextWeekDates)
+                        CalendarGridView(toastManager: toastManager, calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, dates: calendarViewModel.nextWeekDates)
                             .tag(2)
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
@@ -125,6 +125,7 @@ struct CalendarView: View {
 }
 
 struct CalendarGridView: View {
+    @ObservedObject var toastManager: ToastManager
     @ObservedObject var calendarViewModel: CalendarViewModel
     @ObservedObject var complimentViewModel: ComplimentViewModel
     
@@ -137,7 +138,7 @@ struct CalendarGridView: View {
                     ForEach(dates) { value in
                         let compliment = complimentViewModel.complimentList.first { calendarViewModel.isSameDay(date1: $0.date, date2: value.date )}
                         
-                        DateCellView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, calendarDate: value, compliment: compliment)
+                        DateCellView(toastManager: toastManager, calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, calendarDate: value, compliment: compliment)
                     }
                 }
             } else {
@@ -145,7 +146,7 @@ struct CalendarGridView: View {
                     ForEach(dates) { value in
                         let compliment = complimentViewModel.complimentList.first { calendarViewModel.isSameDay(date1: $0.date, date2: value.date )}
                             
-                        WeekDateCellView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, calendarDate: value, compliment: compliment)
+                        WeekDateCellView(toastManager: toastManager, calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, calendarDate: value, compliment: compliment)
                     }
                 }
                 
@@ -190,7 +191,7 @@ struct CalendarGridView: View {
 }
 
 struct DateCellView: View {
-    @EnvironmentObject var toastManager: ToastManager
+    @ObservedObject var toastManager: ToastManager
     @ObservedObject var calendarViewModel: CalendarViewModel
     @ObservedObject var complimentViewModel: ComplimentViewModel
     var calendarDate: CalendarDate
@@ -254,30 +255,30 @@ struct DateCellView: View {
             } label: {
                 switch dateState {
                 case .past:
-                    if compliment?.isRead == true {
-                        Circle()
-                            .fill(Color.pink2)
-                            .overlay(
-                                Image("Character Pink Stiker S")
-                            )
-                    } else {
-                        Circle().fill(Color.gray3)
+                    if let compliment = compliment {
+                        if compliment.isRead {
+                            Circle()
+                                .fill(compliment.compliment.type.color2)
+                                .overlay(compliment.compliment.type.stickerSImage)
+                        } else {
+                            Circle().fill(Color.gray3)
+                        }
                     }
                 case .today:
-                    if compliment?.isRead == true {
-                        Circle()
-                            .fill(Color.pink2)
-                            .overlay(
-                                Image("Character Pink Stiker S")
-                            )
-                    } else {
-                        Circle()
-                            .fill(Color.blue1)
-                            .overlay(
-                                Image("Plus Default")
-                                    .renderingMode(.template)
-                                    .foregroundColor(Color.blue4)
-                            )
+                    if let compliment = compliment {
+                        if compliment.isRead {
+                            Circle()
+                                .fill(compliment.compliment.type.color2)
+                                .overlay(compliment.compliment.type.stickerSImage)
+                        } else {
+                            Circle()
+                                .fill(Color.blue1)
+                                .overlay(
+                                    Image("Plus Default")
+                                        .renderingMode(.template)
+                                        .foregroundColor(Color.blue4)
+                                )
+                        }
                     }
                 case .future:
                     Circle().fill(Color.gray1)
@@ -290,7 +291,7 @@ struct DateCellView: View {
 }
 
 struct WeekDateCellView: View {
-    @EnvironmentObject var toastManager: ToastManager
+    @ObservedObject var toastManager: ToastManager
     @ObservedObject var calendarViewModel: CalendarViewModel
     @ObservedObject var complimentViewModel: ComplimentViewModel
     var calendarDate: CalendarDate
@@ -363,30 +364,30 @@ struct WeekDateCellView: View {
             } label: {
                 switch dateState {
                 case .past, .outsideMonth:
-                    if compliment?.isRead == true {
-                        Circle()
-                            .fill(Color.pink2)
-                            .overlay(
-                                Image("Character Pink Stiker S")
-                            )
-                    } else {
-                        Circle().fill(Color.gray3)
+                    if let compliment = compliment {
+                        if compliment.isRead {
+                            Circle()
+                                .fill(compliment.compliment.type.color2)
+                                .overlay(compliment.compliment.type.stickerSImage)
+                        } else {
+                            Circle().fill(Color.gray3)
+                        }
                     }
                 case .today:
-                    if compliment?.isRead == true {
-                        Circle()
-                            .fill(Color.pink2)
-                            .overlay(
-                                Image("Character Pink Stiker S")
-                            )
-                    } else {
-                        Circle()
-                            .fill(Color.blue1)
-                            .overlay(
-                                Image("Plus Default")
-                                    .renderingMode(.template)
-                                    .foregroundColor(Color.blue4)
-                            )
+                    if let compliment = compliment {
+                        if compliment.isRead {
+                            Circle()
+                                .fill(compliment.compliment.type.color2)
+                                .overlay(compliment.compliment.type.stickerSImage)
+                        } else {
+                            Circle()
+                                .fill(Color.blue1)
+                                .overlay(
+                                    Image("Plus Default")
+                                        .renderingMode(.template)
+                                        .foregroundColor(Color.blue4)
+                                )
+                        }
                     }
                 case .future:
                     Circle().fill(Color.gray1)

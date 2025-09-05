@@ -14,7 +14,7 @@ struct ComplimentResponse: Codable {
 struct Compliment: Identifiable, Codable, Hashable {
     let id: Int
     let content: String
-    let type: String
+    let type: FriendType
     
     enum CodingKeys: String, CodingKey {
         case id, content, type
@@ -23,13 +23,13 @@ struct Compliment: Identifiable, Codable, Hashable {
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try container.decode(Int.self, forKey: .id)
-        self.type = try container.decode(String.self, forKey: .type)
+        self.type = try container.decode(FriendType.self, forKey: .type)
         
         let rawContent = try container.decode(String.self, forKey: .content)
         self.content = rawContent.replacingOccurrences(of: "\\n", with: "\n")
     }
     
-    init(id: Int, content: String, type: String) {
+    init(id: Int, content: String, type: FriendType) {
         self.id = id
         self.content = content
         self.type = type
@@ -53,7 +53,7 @@ struct DailyCompliment: Codable, Hashable {
             compliment: Compliment(
                 id: 1,
                 content: "오늘도 고생 많았어요!\n작은 노력들이 모여 큰 변화를 만들어요.",
-                type: "과정"
+                type: .kind
             ),
             date: ISO8601DateFormatter().date(from: "2025-07-16T00:00:00Z")!,
             isArchived: false,
@@ -63,7 +63,7 @@ struct DailyCompliment: Codable, Hashable {
             compliment: Compliment(
                 id: 2,
                 content: "작은 노력들이 모여 큰 변화를 만들어요.",
-                type: "행동"
+                type: .energetic
             ),
             date: ISO8601DateFormatter().date(from: "2025-08-05T00:00:00Z")!,
             isArchived: false,
@@ -73,7 +73,7 @@ struct DailyCompliment: Codable, Hashable {
             compliment: Compliment(
                 id: 3,
                 content: "꾸준함이 가장 큰 힘이에요.",
-                type: "과정"
+                type: .studious
             ),
             date: ISO8601DateFormatter().date(from: "2025-08-15T00:00:00Z")!,
             isArchived: true,
@@ -83,7 +83,7 @@ struct DailyCompliment: Codable, Hashable {
             compliment: Compliment(
                 id: 4,
                 content: "당신의 성장은 멋져요!",
-                type: "결과"
+                type: .special
             ),
             date: ISO8601DateFormatter().date(from: "2025-08-24T00:00:00Z")!,
             isArchived: false,
@@ -93,11 +93,11 @@ struct DailyCompliment: Codable, Hashable {
             compliment: Compliment(
                 id: 5,
                 content: "믿음직스럽고 든든해요.",
-                type: "행동"
+                type: .quiet
             ),
-            date: ISO8601DateFormatter().date(from: "2025-09-03T00:00:00Z")!,
+            date: ISO8601DateFormatter().date(from: "2025-09-05T00:00:00Z")!,
             isArchived: true,
-            isRead: true
+            isRead: false
         )
     ]
     

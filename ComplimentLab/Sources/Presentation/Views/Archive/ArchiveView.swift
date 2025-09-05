@@ -48,14 +48,14 @@ struct DailyCalendarArchive: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             LazyVStack {
-                ForEach($archiveViewModel.dailyCompliments, id: \.self) { $dailyCompliment in
+                ForEach(archiveViewModel.dailyCompliments, id: \.self) { dailyCompliment in
                     NavigationLink(destination: TodayComplimentView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel)) {
                         VStack(alignment: .leading, spacing: 22) {
                             HStack(alignment: .center) {
-                                Image("Character Pink Stiker S")
+                                dailyCompliment.compliment.type.stickerSImage
                                     .frame(width: 40, height: 40)
                                     .background(
-                                        Circle().fill(Color.pink2)
+                                        Circle().fill(dailyCompliment.compliment.type.color2)
                                     )
                                 
                                 Spacer()
@@ -82,7 +82,7 @@ struct DailyCalendarArchive: View {
                         }
                         .padding(.horizontal, 17)
                         .padding(.vertical, 25)
-                        .background(Color.pink1)
+                        .background(dailyCompliment.compliment.type.color1)
                         .clipShape(RoundedRectangle(cornerRadius: 15))
                         .padding(.bottom, 18)
                     }

@@ -8,23 +8,28 @@
 import SwiftUI
 
 struct TodayComplimentView: View {
-    @EnvironmentObject var toastManager: ToastManager
+    @StateObject private var toastManager = ToastManager()
     @ObservedObject var calendarViewModel: CalendarViewModel
     @ObservedObject var complimentViewModel: ComplimentViewModel
     
     var body: some View {
         ZStack {
-            Color.pink1.ignoresSafeArea()
-            
-            VStack {
-                if let dailyCompliment = complimentViewModel.dailyCompliment {
+            if let dailyCompliment = complimentViewModel.dailyCompliment {
+                // 배경
+                dailyCompliment.compliment.type.color1
+                    .ignoresSafeArea()
+                
+                VStack {
                     YearHeaderView(date: dailyCompliment.date)
                     
                     VStack(spacing: 26) {
                         FlowerView(date: dailyCompliment.date)
                         
                         VStack(spacing: 28) {
-                            let isToday = calendarViewModel.isSameDay(date1: calendarViewModel.selectDate, date2: calendarViewModel.today)
+                            let isToday = calendarViewModel.isSameDay(
+                                date1: calendarViewModel.selectDate,
+                                date2: calendarViewModel.today
+                            )
                             
                             if isToday {
                                 NavigationLink {
@@ -48,11 +53,11 @@ struct TodayComplimentView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal, 17)
                     .padding(.vertical, 25)
-                    .background(Color.pink2)
+                    .background(dailyCompliment.compliment.type.color2)
                     .clipShape(RoundedRectangle(cornerRadius: 15))
                     .padding(.bottom, 15)
                     .overlay(
-                        Image("Character Pink Stiker L")
+                        dailyCompliment.compliment.type.stickerLImage
                             .padding(.top, 25)
                             .padding(.leading, 17),
                         alignment: .topLeading
@@ -64,19 +69,25 @@ struct TodayComplimentView: View {
                         Button {
                             let changedArchived = !dailyCompliment.isArchived
                             complimentViewModel.toggleArchive()
-                            complimentViewModel.patchCompliment(isArchived: changedArchived, isRead: dailyCompliment.isRead, date: dailyCompliment.date)
+                            complimentViewModel.patchCompliment(
+                                isArchived: changedArchived,
+                                isRead: dailyCompliment.isRead,
+                                date: dailyCompliment.date
+                            )
                         } label: {
                             ZStack {
                                 Image("Flower Default Default")
                                 
-                                // TODO: - 아카이브
                                 if dailyCompliment.isArchived {
                                     Image("Flower Pressed")
                                 }
                             }
                         }
                         
-                        let shareImageView = ComplimentShareView(date: dailyCompliment.date, sentence: dailyCompliment.compliment.content)
+                        let shareImageView = ComplimentShareView(
+                            date: dailyCompliment.date,
+                            sentence: dailyCompliment.compliment.content
+                        )
                         
                         if let swiftUIImage = shareImageView.snapshotImage() {
                             let photo = SharePhoto(image: swiftUIImage, caption: "오늘의 칭찬")
@@ -91,23 +102,26 @@ struct TodayComplimentView: View {
                             }
                         }
                     }
+                    
+                    Spacer()
+                    
+                    if toastManager.isShowing {
+                        ToastView(message: toastManager.message, imageTitle: "Check Toast")
+                            .padding(.bottom, 22)
+                    }
                 }
-                
-                Spacer()
-                
-                if toastManager.isShowing {
-                    ToastView(message: toastManager.message, imageTitle: "Check Toast")
-                        .padding(.bottom, 22)
-                }
-            }
-            .padding(.horizontal, 20)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .task {
-                // && 오늘의 칭찬 확인하지 않은 경우
-                let isToday = calendarViewModel.isSameDay(date1: calendarViewModel.selectDate, date2: calendarViewModel.today)
-                
-                if isToday {
-                    toastManager.show(message: "글자를 눌러 직접 입력해 보세요")
+                .padding(.horizontal, 20)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .task {
+                    // 오늘 && 아직 확인하지 않은 경우
+                    let isToday = calendarViewModel.isSameDay(
+                        date1: calendarViewModel.selectDate,
+                        date2: calendarViewModel.today
+                    )
+                    
+                    if isToday && !dailyCompliment.isRead {
+                        toastManager.show(message: "글자를 눌러 직접 입력해 보세요")
+                    }
                 }
             }
         }
