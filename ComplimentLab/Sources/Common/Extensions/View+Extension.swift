@@ -11,11 +11,13 @@ extension View {
     func customNavigationBar<C: View, L: View, R: View>(
         @ViewBuilder centerView: @escaping () -> C = { EmptyView() },
         @ViewBuilder leftView: @escaping () -> L = { EmptyView() },
-        @ViewBuilder rightView: @escaping () -> R = { EmptyView() }
+        @ViewBuilder rightView: @escaping () -> R = { EmptyView() },
+        overlay: Bool = false
     ) -> some View {
         self.modifier(CustomNavigationBarModifier(centerView: centerView,
                                                  leftView: leftView,
-                                                 rightView: rightView))
+                                                 rightView: rightView,
+                                                 overlay: overlay))
     }
     
     func snapshotImage(
