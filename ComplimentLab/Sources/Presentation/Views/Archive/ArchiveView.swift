@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct ArchiveView: View {
-    @StateObject private var archiveViewModel = ArchiveViewModel()
+//    @StateObject private var archiveViewModel = ArchiveViewModel(useCase: ComplimentAPI())
     @ObservedObject var calendarViewModel: CalendarViewModel
     @ObservedObject var complimentViewModel: ComplimentViewModel
+    @ObservedObject var archiveViewModel: ArchiveViewModel
     @State var selectedPick = "일력"
     
     var body: some View {
@@ -35,6 +36,10 @@ struct ArchiveView: View {
             }
         )
         .task {
+            archiveViewModel.getArchivedCompliments(
+                year: calendarViewModel.selectedYear,
+                month: calendarViewModel.selectedMonth
+            )
             archiveViewModel.sortByDate(type: .recent)
         }
     }
@@ -48,7 +53,7 @@ struct DailyCalendarArchive: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             LazyVStack {
-                ForEach(archiveViewModel.dailyCompliments, id: \.self) { dailyCompliment in
+                ForEach(archiveViewModel.archivedCompliments, id: \.self) { dailyCompliment in
                     NavigationLink(destination: TodayComplimentView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel)) {
                         VStack(alignment: .leading, spacing: 22) {
                             HStack(alignment: .center) {
@@ -64,7 +69,13 @@ struct DailyCalendarArchive: View {
                                     .foregroundStyle(Color.gray4)
                                 
                                 Button {
-//                                    archiveViewModel.toggleArchive(id: dailyCompliment.id)
+                                    let changedArchived = !dailyCompliment.isArchived
+                                    
+                                    if let index = archiveViewModel.archivedCompliments.firstIndex(where: { calendarViewModel.isSameDay(date1: $0.date, date2: dailyCompliment.date )}) {
+                                        archiveViewModel.archivedCompliments[index].isArchived.toggle()
+                                    }
+                                    
+                                    complimentViewModel.patchCompliment(isArchived: changedArchived, isRead: dailyCompliment.isRead, date: dailyCompliment.date)
                                 } label: {
                                     ZStack {
                                         Image("Flower Default Default")

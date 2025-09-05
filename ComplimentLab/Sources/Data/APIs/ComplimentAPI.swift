@@ -73,4 +73,23 @@ final class ComplimentAPI: ComplimentUseCase {
                 }
             }
     }
+    
+    func archivedCompliment(date: String, token: String) -> Observable<[DailyCompliment]> {
+        let url = URL(string: "\(baseURL)/archived/\(date)")!
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .formatted(DateFormatterManager.shared.apiFormatter)
+        
+        return URLSession.shared.rx.data(request: request)
+            .map { data -> [DailyCompliment] in
+                let response = try decoder.decode(ComplimentResponse.self, from: data)
+                return response.compliments
+            }
+            .catchAndReturn([])
+            .observe(on: MainScheduler.instance)
+    }
 }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RxSwift
 
 enum SortType {
     case recent
@@ -13,23 +14,33 @@ enum SortType {
 }
 
 final class ArchiveViewModel: ObservableObject {
-    @Published var dailyCompliments: [DailyCompliment] = DailyCompliment.mockCompliments
+    @Published var archivedCompliments: [DailyCompliment] = []
     
-    func getArchivedCompliments(token: String, date: Date) {
+    let useCase: ComplimentUseCase
+    let disposeBag = DisposeBag()
+    
+    init(useCase: ComplimentUseCase) {
+        self.useCase = useCase
+    }
+    
+    func getArchivedCompliments(year: Int, month: Int) {
+        let date = "\(year)-\(String(format: "%02d", month))"
+        guard let accessToken = KeychainStorage.shared.getToken()?.accessToken else {
+            return
+        }
         
+        useCase.archivedCompliment(date: date, token: accessToken)
+            .subscribe(onNext: { [weak self] items in
+                self?.archivedCompliments = items
+            })
+            .disposed(by: disposeBag)
     }
     
     func sortByDate(type: SortType) {
         if type == .recent {
-            dailyCompliments = dailyCompliments.sorted { $0.date > $1.date }
+            archivedCompliments = archivedCompliments.sorted { $0.date > $1.date }
         } else {
-            dailyCompliments = dailyCompliments.sorted { $0.date < $1.date }
-        }
-    }
-    
-    func toggleArchive(id: String) {
-        if let index = dailyCompliments.firstIndex(where: { $0.id == id }) {
-            dailyCompliments[index].isArchived.toggle()
+            archivedCompliments = archivedCompliments.sorted { $0.date < $1.date }
         }
     }
 }

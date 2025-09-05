@@ -10,6 +10,7 @@ import SwiftUI
 struct CustomTabView: View {
     @StateObject var calendarViewModel = CalendarViewModel()
     @StateObject var complimentViewModel = ComplimentViewModel(useCase: ComplimentAPI())
+    @StateObject var archiveViewModel = ArchiveViewModel(useCase: ComplimentAPI())
     @StateObject var friendsViewModel = FriendsViewModel()
     @State private var selection = 0
     @State private var showCreateFriends = false
@@ -44,7 +45,7 @@ struct CustomTabView: View {
                         }
                         .tag(1)
                     
-                    ArchiveView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel)
+                    ArchiveView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, archiveViewModel: archiveViewModel)
                         .tabItem {
                             selection == 2 ? Image("Archive Pressed") : Image("Archive Default")
                             Text("기록")
@@ -66,7 +67,7 @@ struct CustomTabView: View {
                             calendarViewModel.shouldShowMonthPicker = false
                         }
                     
-                    YearMonthPickerView(calendarViewModel: calendarViewModel, pickerYear: calendarViewModel.selectedYear)
+                    YearMonthPickerView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, archiveViewModel: archiveViewModel, pickerYear: calendarViewModel.selectedYear)
                         .clipShape(RoundedRectangle(cornerRadius: 15))
                         .padding(35)
                 }

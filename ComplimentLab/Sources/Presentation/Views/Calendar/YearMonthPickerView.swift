@@ -9,6 +9,8 @@ import SwiftUI
 
 struct YearMonthPickerView: View {
     @ObservedObject var calendarViewModel: CalendarViewModel
+    @ObservedObject var complimentViewModel: ComplimentViewModel
+    @ObservedObject var archiveViewModel: ArchiveViewModel
     let months: [String] = Calendar.current.shortMonthSymbols
     @State var pickerYear: Int
     
@@ -49,6 +51,14 @@ struct YearMonthPickerView: View {
                     } else {
                         Button {
                             calendarViewModel.changeMonth(year: pickerYear, month: index + 1)
+                            
+                            complimentViewModel.fetchMonthlyCompliment(year: calendarViewModel.selectedYear, month: calendarViewModel.selectedMonth)
+                            
+                            archiveViewModel.getArchivedCompliments(
+                                year: calendarViewModel.selectedYear,
+                                month: calendarViewModel.selectedMonth
+                            )
+                            
                             calendarViewModel.shouldShowMonthPicker = false
                         } label: {
                             Text(months[index])
@@ -65,8 +75,4 @@ struct YearMonthPickerView: View {
         .padding()
         .background(Color.gray0)
     }
-}
-
-#Preview {
-    YearMonthPickerView(calendarViewModel: CalendarViewModel(), pickerYear: 2025)
 }
