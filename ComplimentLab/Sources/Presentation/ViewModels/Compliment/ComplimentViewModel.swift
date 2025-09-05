@@ -29,8 +29,11 @@ final class ComplimentViewModel: ObservableObject {
     
     func fetchMonthlyCompliment(year: Int, month: Int) {
         let date = "\(year)-\(String(format: "%02d", month))"
+        guard let accessToken = KeychainStorage.shared.getToken()?.accessToken else {
+            return
+        }
         
-        useCase.getMonthlyCompliment(date: date)
+        useCase.getMonthlyCompliment(date: date, token: accessToken)
             .subscribe(onNext: { [weak self] items in
                 self?.complimentList = items
             })
@@ -38,11 +41,12 @@ final class ComplimentViewModel: ObservableObject {
     }
     
     func fetchWeeklyCompliment(weekDates: [CalendarDate]) {
-        guard let start = weekDates.first?.date, let end = weekDates.last?.date else { return }
+        guard let start = weekDates.first?.date, let end = weekDates.last?.date, let accessToken = KeychainStorage.shared.getToken()?.accessToken else { return }
         
         useCase.getWeeklyCompliment(
             startDate: DateFormatterManager.shared.apiDate(from: start),
-            endDate: DateFormatterManager.shared.apiDate(from: end)
+            endDate: DateFormatterManager.shared.apiDate(from: end),
+            token: accessToken
         )
         .subscribe(onNext: { [weak self] items in
             self?.complimentList = items
@@ -52,10 +56,14 @@ final class ComplimentViewModel: ObservableObject {
     
     func patchCompliment(isArchived: Bool, isRead: Bool, date: Date) {
         let editComplimentDTO = EditComplimentDTO(isArchived: isArchived, isRead: isRead)
+        guard let accessToken = KeychainStorage.shared.getToken()?.accessToken else {
+            return
+        }
         
         useCase.patchCompliment(
             editComplimentDTO: editComplimentDTO,
-            date: DateFormatterManager.shared.apiDate(from: date)
+            date: DateFormatterManager.shared.apiDate(from: date),
+            token: accessToken
         )
             .subscribe(
                 onNext: {

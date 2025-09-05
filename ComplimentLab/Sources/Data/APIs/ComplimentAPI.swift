@@ -10,8 +10,8 @@ import RxSwift
 import RxCocoa
 
 final class ComplimentAPI: ComplimentUseCase {
-
-    func getMonthlyCompliment(date: String) -> Observable<[DailyCompliment]> {
+    
+    func getMonthlyCompliment(date: String, token: String) -> Observable<[DailyCompliment]> {
         let url = URL(string: "\(baseURL)/month/\(date)")!
         
         var request = URLRequest(url: url)
@@ -30,7 +30,7 @@ final class ComplimentAPI: ComplimentUseCase {
             .observe(on: MainScheduler.instance)
     }
     
-    func getWeeklyCompliment(startDate: String, endDate: String) -> Observable<[DailyCompliment]> {
+    func getWeeklyCompliment(startDate: String, endDate: String, token: String) -> Observable<[DailyCompliment]> {
         let url = URL(string: "\(baseURL)/week?start=\(startDate)&end=\(endDate)")!
         
         var request = URLRequest(url: url)
@@ -51,7 +51,7 @@ final class ComplimentAPI: ComplimentUseCase {
             .observe(on: MainScheduler.instance)
     }
     
-    func patchCompliment(editComplimentDTO: EditComplimentDTO, date: String) -> Observable<Void> {
+    func patchCompliment(editComplimentDTO: EditComplimentDTO, date: String, token: String) -> Observable<Void> {
         let url = URL(string: "\(baseURL)/logs/\(date)")!
         
         guard let jsonData = try? JSONEncoder().encode(editComplimentDTO) else {

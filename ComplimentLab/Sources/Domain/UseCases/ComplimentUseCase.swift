@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 protocol ComplimentUseCase {
-    func getMonthlyCompliment(date: String) -> Observable<[DailyCompliment]>
-    func getWeeklyCompliment(startDate: String, endDate: String) -> Observable<[DailyCompliment]>
-    func patchCompliment(editComplimentDTO: EditComplimentDTO, date: String) -> Observable<Void>
+    func getMonthlyCompliment(date: String, token: String) -> Observable<[DailyCompliment]>
+    func getWeeklyCompliment(startDate: String, endDate: String, token: String) -> Observable<[DailyCompliment]>
+    func patchCompliment(editComplimentDTO: EditComplimentDTO, date: String, token: String) -> Observable<Void>
 }
