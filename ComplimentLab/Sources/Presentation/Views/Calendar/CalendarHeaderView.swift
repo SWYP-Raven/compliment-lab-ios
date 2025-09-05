@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CalendarHeaderView: View {
     @ObservedObject var calendarViewModel: CalendarViewModel
+    @ObservedObject var complimentViewModel: ComplimentViewModel
 
     var body: some View {
         HStack {
@@ -32,8 +33,10 @@ struct CalendarHeaderView: View {
                 .onChange(of: calendarViewModel.mode) { _, newValue in
                     if newValue == .month {
                         calendarViewModel.monthDates = calendarViewModel.getMonthDate(for: calendarViewModel.month)
+                        complimentViewModel.fetchMonthlyCompliment(year: calendarViewModel.selectedYear, month: calendarViewModel.selectedMonth)
                     } else {
                         calendarViewModel.weekDates = calendarViewModel.getWeekDate(for: calendarViewModel.week)
+                        complimentViewModel.fetchWeeklyCompliment(weekDates: calendarViewModel.weekDates)
                     }
                 }
         }
@@ -81,9 +84,4 @@ struct NavigateToFriendView: View {
         .background(Color.blue1)
         .clipShape(RoundedRectangle(cornerRadius: 15))
     }
-}
-
-
-#Preview {
-    CalendarHeaderView(calendarViewModel: CalendarViewModel())
 }

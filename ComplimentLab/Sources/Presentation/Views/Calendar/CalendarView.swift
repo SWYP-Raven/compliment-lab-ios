@@ -19,7 +19,7 @@ struct CalendarView: View {
     var body: some View {
         ZStack(alignment: .top) {
             VStack(alignment: .leading) {
-                CalendarHeaderView(calendarViewModel: calendarViewModel)
+                CalendarHeaderView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel)
                     .padding(.bottom, 15)
                 NavigateToFriendView()
                     .padding(.bottom, 18)

@@ -161,12 +161,12 @@ final class CalendarViewModel: ObservableObject {
         if let newWeek = calendar.date(byAdding: .weekOfYear, value: value, to: week) {
             self.week = newWeek
             
-            let newMonthComponent = calendar.dateComponents([.month], from: newWeek)
-            let oldMonthComponent = calendar.dateComponents([.month], from: month)
+            let newMonthComponent = calendar.dateComponents([.year, .month], from: newWeek)
+            let oldMonthComponent = calendar.dateComponents([.year, .month], from: month)
             
             if newMonthComponent.month != oldMonthComponent.month {
                 self.month = newWeek
-                
+
                 if let y = newMonthComponent.year, let m = newMonthComponent.month {
                     self.selectedYear = y
                     self.selectedMonth = m
