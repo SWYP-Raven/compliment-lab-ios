@@ -61,14 +61,14 @@ struct WeekdayHeaderView: View {
 
 // TODO: - 유저 닉네임 추가
 struct NavigateToFriendView: View {
+    @EnvironmentObject var loginViewModel: LoginViewModel
+    
     var body: some View {
         HStack {
             Image("Character Pink half")
             
             VStack(alignment: .leading) {
-                let username = UserDefaults.standard.string(forKey: "username") ?? ""
-                
-                Text("\(username)님,")
+                Text("\(loginViewModel.username)님,")
                     .font(.suite(.bold, size: 17))
                     .foregroundColor(Color.blue4)
                 

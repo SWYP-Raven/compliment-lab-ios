@@ -1,19 +1,21 @@
 import SwiftUI
 
 public struct ContentView: View {
+    @EnvironmentObject var loginViewModel: LoginViewModel
     @State private var isActive = false
     
     public init() {}
 
     public var body: some View {
-        PinkGradientSplashView(isActive: $isActive)
-            .fullScreenCover(isPresented: $isActive) {
-                if KeychainStorage.shared.hasToken() {
-                    CustomTabView()
-                } else {
-                    LoginView(loginViewModel: LoginViewModel())
-                }
+        if isActive {
+            if loginViewModel.hasToken {
+                CustomTabView()
+            } else {
+                LoginView(loginViewModel: loginViewModel)
             }
+        } else {
+            PinkGradientSplashView(isActive: $isActive)
+        }
     }
 }
 

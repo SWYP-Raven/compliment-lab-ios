@@ -48,4 +48,6 @@ extension Color {
     static let green4 = Color("green4")
     
     static let orange4 = Color("orange4")
+    
+    static let negative = Color("Negative")
 }

@@ -117,9 +117,6 @@ struct CalendarView: View {
                 calendarViewModel.weekDates = calendarViewModel.getWeekDate(for: calendarViewModel.week)
                 complimentViewModel.fetchWeeklyCompliment(weekDates: calendarViewModel.weekDates)
             }
-            
-//            let vm = LoginViewModel()
-//            vm.logout()
         }
     }
 }
@@ -159,9 +156,13 @@ struct CalendarGridView: View {
     @ViewBuilder
     func compliementPreview() -> some View {
         if let dailyCompliment = complimentViewModel.dailyCompliment {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 22) {
                 HStack {
-                    dailyCompliment.compliment.type.stickerLImage
+                    dailyCompliment.compliment.type.stickerSImage
+                        .frame(width: 40, height: 40)
+                        .background(
+                            Circle().fill(dailyCompliment.compliment.type.color2)
+                        )
                     Spacer()
                     Button {
                         let changedArchived = !dailyCompliment.isArchived
@@ -178,6 +179,7 @@ struct CalendarGridView: View {
                     }
                 }
                 Text(dailyCompliment.compliment.content)
+                    .font(.suite(.medium, size: 14))
             }
             .padding(.horizontal, 17)
             .padding(.vertical, 25)

@@ -47,9 +47,6 @@ struct LoginView: View {
                 ProfileSetupView(profileSetupViewModel: .init())
             }
         }
-        .fullScreenCover(isPresented: $navigateToMain) {
-            CustomTabView()
-        }
         .toolbarVisibility(.hidden, for: .navigationBar)
     }
     
@@ -175,10 +172,6 @@ struct OnboardingPageView: View {
             Spacer()
         }
     }
-}
-
-#Preview {
-    LoginView(loginViewModel: LoginViewModel())
 }
 
 

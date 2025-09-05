@@ -14,6 +14,7 @@ enum SettingItem: String, CaseIterable {
 }
 
 struct SettingView: View {
+    @EnvironmentObject var loginViewModel: LoginViewModel
     @State private var isSheetPresented: Bool = false
     @Environment(\.dismiss) var dismiss
     var showBackButton: Bool = false
@@ -51,8 +52,6 @@ struct SettingView: View {
                     }
                     
                     Divider()
-                    
-                    SettingRow(title: "서비스 이용 약관", destination: AnyView(EmptyView()))
 
                     HStack {
                         Text("앱 버전 정보")
@@ -104,6 +103,7 @@ struct SettingRow: View {
 }
 
 struct SettingNicknameView: View {
+    @EnvironmentObject var loginViewModel: LoginViewModel
     @State private var isSheetPresented: Bool = false
     
     var body: some View {
@@ -113,9 +113,7 @@ struct SettingNicknameView: View {
                 .foregroundStyle(Color.gray6)
             
             HStack {
-                let username = UserDefaults.standard.string(forKey: "username") ?? ""
-                
-                Text("\(username)")
+                Text("\(loginViewModel.username)")
                     .font(.suite(.semiBold, size: 24))
                     .foregroundStyle(Color.gray8)
                 
@@ -144,6 +142,7 @@ struct SettingNicknameView: View {
 }
 
 struct NicknameEditView: View {
+    @EnvironmentObject var loginViewModel: LoginViewModel
     @FocusState private var isFocused: Bool
     @State private var text: String = ""
     @Environment(\.dismiss) var dismiss
@@ -173,6 +172,7 @@ struct NicknameEditView: View {
                 .padding(.bottom, 47)
             
             Button {
+                loginViewModel.editUser(nickname: text)
                 dismiss()
             } label: {
                 Text("작성 완료")
