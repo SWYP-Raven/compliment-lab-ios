@@ -9,8 +9,17 @@ import Foundation
 import RxSwift
 
 final class LoginAPI: LoginUseCase {
+    private let baseURL: String
+    
+    init() {
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BaseURL") as? String else {
+            fatalError("BaseURL not set in plist")
+        }
+        self.baseURL = baseURL
+    }
+    
     func editUser(editUserDTO: EditUserDTO, token: String) -> Observable<Void> {
-        let url = URL(string: "https://dev.compliment-lab.store/user")!
+        let url = URL(string: "\(baseURL)/user")!
         
         guard let jsonData = try? JSONEncoder().encode(editUserDTO) else {
             fatalError("Json Encode Error")
@@ -30,5 +39,24 @@ final class LoginAPI: LoginUseCase {
                     return .error(NSError(domain: "HTTPError", code: response.statusCode))
                 }
             }
+            .observe(on: MainScheduler.instance)
+    }
+    
+    func deleteUser(token: String) -> Observable<Void> {
+        let url = URL(string: "\(baseURL)/user")!
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        return URLSession.shared.rx.response(request: request)
+            .flatMap { response, _ -> Observable<Void> in
+                if 200..<300 ~= response.statusCode {
+                    return .just(())
+                } else {
+                    return .error(NSError(domain: "HTTPError", code: response.statusCode))
+                }
+            }
+            .observe(on: MainScheduler.instance)
     }
 }

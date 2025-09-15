@@ -13,7 +13,7 @@ final class ProfileSetupViewModel: ObservableObject {
     
     func requestSetProfile(name: String) {
         print(#function, #line, "Path : # ")
-        guard let url = URL(string: "https://dev.compliment-lab.store/user"),
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BaseURL") as? String, let url = URL(string: "\(baseURL)/user"),
         let accessToken = KeychainStorage.shared.getToken()?.accessToken else {
             return
         }

@@ -10,4 +10,5 @@ import RxSwift
 
 protocol LoginUseCase {
     func editUser(editUserDTO: EditUserDTO, token: String) -> Observable<Void>
+    func deleteUser(token: String) -> Observable<Void>
 }

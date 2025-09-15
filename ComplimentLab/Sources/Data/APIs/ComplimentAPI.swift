@@ -10,9 +10,17 @@ import RxSwift
 import RxCocoa
 
 final class ComplimentAPI: ComplimentUseCase {
+    private let baseURL: String
+    
+    init() {
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BaseURL") as? String else {
+            fatalError("BaseURL not set in plist")
+        }
+        self.baseURL = baseURL
+    }
     
     func getMonthlyCompliment(date: String, token: String) -> Observable<[DailyCompliment]> {
-        let url = URL(string: "\(baseURL)/month/\(date)")!
+        let url = URL(string: "\(baseURL)/compliments/month/\(date)")!
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -31,7 +39,7 @@ final class ComplimentAPI: ComplimentUseCase {
     }
     
     func getWeeklyCompliment(startDate: String, endDate: String, token: String) -> Observable<[DailyCompliment]> {
-        let url = URL(string: "\(baseURL)/week?start=\(startDate)&end=\(endDate)")!
+        let url = URL(string: "\(baseURL)/compliments/week?start=\(startDate)&end=\(endDate)")!
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -52,7 +60,7 @@ final class ComplimentAPI: ComplimentUseCase {
     }
     
     func patchCompliment(editComplimentDTO: EditComplimentDTO, date: String, token: String) -> Observable<Void> {
-        let url = URL(string: "\(baseURL)/logs/\(date)")!
+        let url = URL(string: "\(baseURL)/compliments/logs/\(date)")!
         
         guard let jsonData = try? JSONEncoder().encode(editComplimentDTO) else {
             fatalError("Json Encode Error")
@@ -72,10 +80,11 @@ final class ComplimentAPI: ComplimentUseCase {
                     return .error(NSError(domain: "HTTPError", code: response.statusCode))
                 }
             }
+            .observe(on: MainScheduler.instance)
     }
     
     func archivedCompliment(date: String, token: String) -> Observable<[DailyCompliment]> {
-        let url = URL(string: "\(baseURL)/archived/\(date)")!
+        let url = URL(string: "\(baseURL)/compliments/archived/\(date)")!
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"

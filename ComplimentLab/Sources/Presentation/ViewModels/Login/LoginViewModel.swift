@@ -24,7 +24,7 @@ final class LoginViewModel: ObservableObject {
     
     func loginWithApple(identityToken: String) {
         print(#function, #line, "Path : # ")
-        guard let url = URL(string: "https://dev.compliment-lab.store/auth/apple") else {
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BaseURL") as? String, let url = URL(string: "\(baseURL)/auth/apple") else {
             return
         }
         
@@ -86,6 +86,29 @@ final class LoginViewModel: ObservableObject {
                 },
                 onError: { error in
                     print("닉네임 변경 실패: \(error)")
+                }
+            )
+            .disposed(by: disposeBag)
+    }
+    
+    func deleteUser() {
+        guard let accessToken = KeychainStorage.shared.getToken()?.accessToken else {
+            return
+        }
+        
+        useCase.deleteUser(token: accessToken)
+            .subscribe(
+                onNext: {
+                    if let bundleID = Bundle.main.bundleIdentifier {
+                        UserDefaults.standard.removePersistentDomain(forName: bundleID)
+                        UserDefaults.standard.synchronize()
+                    }
+                    KeychainStorage.shared.deleteToken()
+                    self.hasToken = false
+                    print("유저 탈퇴 성공")
+                },
+                onError: { error in
+                    print("유저 탈퇴 실패: \(error)")
                 }
             )
             .disposed(by: disposeBag)
