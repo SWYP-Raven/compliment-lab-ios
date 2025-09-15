@@ -8,13 +8,15 @@
 import SwiftUI
 
 struct CreateFriendNameView: View {
-    let friendType: FriendType
+    @ObservedObject var friendViewModel: FriendsViewModel
     @StateObject private var toastManager = ToastManager()
     @Binding var friendName: String
     @Binding var showCompleteView: Bool
     @State private var showToast = false
     @State private var navigateToCompleteView = false
     @FocusState private var isTextFieldFocused: Bool
+    
+    let friendType: FriendType
     
     private let maxLength = 10
     
@@ -77,6 +79,8 @@ struct CreateFriendNameView: View {
             Button(action: {
                 withAnimation(.none) {
                     showCompleteView = true
+                    friendViewModel.currentPage = .complete
+                    friendViewModel.createFriend(name: friendName, friendType: friendType.rawValue)
                 }
             }) {
                 Text("칭구 만나기")

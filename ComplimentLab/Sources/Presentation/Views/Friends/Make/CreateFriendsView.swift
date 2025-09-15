@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct FriendCreationView: View {
+    @ObservedObject var friendViewModel: FriendsViewModel
     @Binding var showCreateFriends: Bool
     @State private var currentPage = 0
     @State private var selectedType: FriendType?
@@ -18,29 +19,32 @@ struct FriendCreationView: View {
     
     var body: some View {
         ZStack {
-            if showCompleteView {
-                FriendCompleteView(
-                    showCompleteView: $showCompleteView,
-                    showCreateFriends: $showCreateFriends,
-                    friendType: selectedType ?? .kind,
-                    friendName: friendName
-                )
-                .transition(.identity)
-            } else {
+            switch friendViewModel.currentPage {
+            case .create:
                 VStack(spacing: 0) {
                     if currentPage == 0 {
-                        CreateFriendTypeView(selectedType: $selectedType) {
+                        CreateFriendTypeView(friendViewModel: friendViewModel, selectedType: $selectedType) {
                             currentPage = 1
                         }
                     } else {
                         if let selectedType {
-                            CreateFriendNameView(friendType: selectedType,
+                            CreateFriendNameView(friendViewModel: friendViewModel, friendType: selectedType,
                                                  friendName: $friendName,
                                                  showCompleteView: $showCompleteView)
                         }
                     }
                 }
                 .background(Color.white)
+            case .complete:
+                FriendCompleteView(
+                    friendViewModel: friendViewModel, showCompleteView: $showCompleteView,
+                    showCreateFriends: $showCreateFriends,
+                    friendType: selectedType ?? .kind,
+                    friendName: friendName
+                )
+                .transition(.identity)
+            case .chat:
+                ChatingView(friend: friendViewModel.friend)
             }
         }
         .customNavigationBar(
@@ -72,9 +76,4 @@ struct FriendCreationView: View {
             overlay: showCompleteView
         )
     }
-}
-
-#Preview {
-    @State var showCreateFriends = false
-    FriendCreationView(showCreateFriends: $showCreateFriends)
 }
