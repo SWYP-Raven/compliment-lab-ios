@@ -27,10 +27,8 @@ struct FriendCreationView: View {
                             currentPage = 1
                         }
                     } else {
-                        if let selectedType {
-                            CreateFriendNameView(friendViewModel: friendViewModel, friendType: selectedType,
-                                                 friendName: $friendName,
-                                                 showCompleteView: $showCompleteView)
+                        if let selectedType {                            
+                            CreateFriendNameView(friendViewModel: friendViewModel, friendName: $friendName, showCompleteView: $showCompleteView, friendType: selectedType)
                         }
                     }
                 }
