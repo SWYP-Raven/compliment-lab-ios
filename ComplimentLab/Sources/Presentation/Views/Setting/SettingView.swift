@@ -184,7 +184,8 @@ struct NicknameEditView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 14))
             }
             .buttonStyle(PlainButtonStyle())
-            .disabled(text.isEmpty)
+            .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines)
+.isEmpty)
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 22)

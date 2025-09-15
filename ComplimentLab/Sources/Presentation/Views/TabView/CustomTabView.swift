@@ -10,8 +10,8 @@ import SwiftUI
 struct CustomTabView: View {
     @StateObject var calendarViewModel = CalendarViewModel()
     @StateObject var complimentViewModel = ComplimentViewModel(useCase: ComplimentAPI())
-    @StateObject var archiveViewModel = ArchiveViewModel(useCase: ComplimentAPI())
-    @StateObject var friendsViewModel = FriendsViewModel()
+    @StateObject var archiveViewModel = ArchiveViewModel(useCase: ComplimentAPI(), chatUseCase: ChatAPI())
+    @StateObject var friendsViewModel = FriendsViewModel(useCase: FriendAPI())
     @State private var selection = 0
     @State private var showCreateFriends = false
     
@@ -37,8 +37,8 @@ struct CustomTabView: View {
                             Text("일력")
                         }
                         .tag(0)
-
-                    FriendView()
+                    
+                    FriendView(friendViewModel: friendsViewModel, selection: $selection)
                         .tabItem {
                             selection == 1 ? Image("Chat Pressed") : Image("Chat Default")
                             Text("칭구")
@@ -71,6 +71,8 @@ struct CustomTabView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 15))
                         .padding(35)
                 }
+                
+                FriendAlertView(friendViewModel: friendsViewModel)
             }
             .navigationDestination(isPresented: $calendarViewModel.isButtonTapped) {
                 TodayComplimentView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel)

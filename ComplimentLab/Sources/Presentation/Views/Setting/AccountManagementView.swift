@@ -136,7 +136,7 @@ struct CustomAlertView: View {
                         if type == .logout {
                             loginViewModel.logout()
                         } else {
-                            
+                            loginViewModel.deleteUser()
                         }
                         showAlert = false
                     }) {
