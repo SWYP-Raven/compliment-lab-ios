@@ -43,23 +43,6 @@ struct CalendarHeaderView: View {
     }
 }
 
-struct WeekdayHeaderView: View {
-    let weekdaySymbols = Calendar.current.veryShortWeekdaySymbols
-    
-    var body: some View {
-        HStack {
-            ForEach(Array(weekdaySymbols.enumerated()), id: \.offset) { _, symbol in
-                Text(symbol)
-                    .frame(maxWidth: .infinity)
-                    .font(.suite(.medium, size: 12))
-                    .foregroundStyle(Color.gray4)
-            }
-        }
-        .padding(.bottom)
-    }
-}
-
-// TODO: - 유저 닉네임 추가
 struct NavigateToFriendView: View {
     @EnvironmentObject var loginViewModel: LoginViewModel
     
@@ -83,7 +66,24 @@ struct NavigateToFriendView: View {
         .frame(maxWidth: .infinity)
         .padding(.leading, 22)
         .padding(.trailing, 15)
+        .padding(.top, 10)
         .background(Color.blue1)
         .clipShape(RoundedRectangle(cornerRadius: 15))
+    }
+}
+
+struct WeekdayHeaderView: View {
+    let weekdaySymbols = Calendar.current.veryShortWeekdaySymbols
+    
+    var body: some View {
+        HStack {
+            ForEach(Array(weekdaySymbols.enumerated()), id: \.offset) { _, symbol in
+                Text(symbol)
+                    .frame(maxWidth: .infinity)
+                    .font(.suite(.medium, size: 12))
+                    .foregroundStyle(Color.gray4)
+            }
+        }
+        .padding(.bottom)
     }
 }

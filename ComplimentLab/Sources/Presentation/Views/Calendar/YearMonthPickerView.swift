@@ -59,6 +59,11 @@ struct YearMonthPickerView: View {
                                 month: calendarViewModel.selectedMonth
                             )
                             
+                            archiveViewModel.getArchivedCards(
+                                year: calendarViewModel.selectedYear,
+                                month: calendarViewModel.selectedMonth
+                            )
+                            
                             calendarViewModel.shouldShowMonthPicker = false
                         } label: {
                             Text(months[index])
