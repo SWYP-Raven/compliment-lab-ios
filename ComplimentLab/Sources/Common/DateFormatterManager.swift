@@ -63,4 +63,23 @@ final class DateFormatterManager {
     func monthEnglish(from date: Date) -> String { monthEnglishFormatter.string(from: date) }
     func day(from date: Date) -> String { dayFormatter.string(from: date) }
     func dottedDate(from date: Date) -> String { dottedFormatter.string(from: date) }
+    
+    func chatDisplayString(from date: Date) -> String {
+        let calendar = Calendar.current
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        
+        if calendar.isDateInToday(date) {
+            formatter.dateFormat = "a h:mm"
+            return formatter.string(from: date)
+        } else if calendar.isDateInYesterday(date) {
+            return "어제"
+        } else if let twoDaysAgo = calendar.date(byAdding: .day, value: -2, to: Date()),
+                  calendar.isDate(date, inSameDayAs: twoDaysAgo) {
+            return "그저께"
+        } else {
+            formatter.dateFormat = "M월 d일"
+            return formatter.string(from: date)
+        }
+    }
 }
