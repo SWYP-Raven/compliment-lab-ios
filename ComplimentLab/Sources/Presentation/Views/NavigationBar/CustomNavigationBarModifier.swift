@@ -30,7 +30,6 @@ struct CustomNavigationBarModifier<C: View, L: View, R: View>: ViewModifier {
             if overlay {
                 ZStack(alignment: .top) {
                     content
-                        .ignoresSafeArea(.all)
                     
                     navBar
                 }

@@ -19,6 +19,8 @@ struct HandCopyingSuccessView: View {
                     
                     VStack(spacing: 28) {
                         Text("필사 완료")
+                            .font(.suite(.bold, size: 17))
+                            .foregroundStyle(Color.gray8)
                         
                         VStack(alignment: .leading, spacing: 12) {
                             Text(dailyCompliment.compliment.content)
@@ -52,8 +54,7 @@ struct HandCopyingSuccessView: View {
                         }
                         
                         let shareImageView = ComplimentShareView(
-                            date: dailyCompliment.date,
-                            sentence: dailyCompliment.compliment.content
+                            dailyCompliment: dailyCompliment
                         )
                         
                         if let swiftUIImage = shareImageView.snapshotImage() {

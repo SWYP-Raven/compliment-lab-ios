@@ -86,8 +86,7 @@ struct TodayComplimentView: View {
                         }
                         
                         let shareImageView = ComplimentShareView(
-                            date: dailyCompliment.date,
-                            sentence: dailyCompliment.compliment.content
+                            dailyCompliment: dailyCompliment
                         )
                         
                         if let swiftUIImage = shareImageView.snapshotImage() {
@@ -205,25 +204,24 @@ struct ComplimentTextView: View {
 }
 
 struct ComplimentShareView: View {
-    let date: Date
-    let sentence: String
+    let dailyCompliment: DailyCompliment
     
     var body: some View {
         VStack(spacing: 26) {
-            FlowerView(date: date)
+            FlowerView(date: dailyCompliment.date)
             
             VStack(spacing: 28) {
-                ComplimentTextView(sentence: sentence)
+                ComplimentTextView(sentence: dailyCompliment.compliment.content)
                 Image("logo home")
             }
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 17)
         .padding(.vertical, 25)
-        .background(Color.pink2)
+        .background(dailyCompliment.compliment.type.color2)
         .padding(.bottom, 15)
         .overlay(
-            Image("Character Pink Stiker L")
+            dailyCompliment.compliment.type.stickerLImage
                 .padding(.top, 25)
                 .padding(.leading, 17),
             alignment: .topLeading
