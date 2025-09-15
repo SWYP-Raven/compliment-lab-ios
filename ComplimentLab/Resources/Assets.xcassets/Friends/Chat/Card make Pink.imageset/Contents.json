@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "quiet.png",
+      "filename" : "Card make Pink.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "quiet@2x.png",
+      "filename" : "Card make Pink@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "quiet@3x.png",
+      "filename" : "Card make Pink@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
