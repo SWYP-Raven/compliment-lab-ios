@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CreateFriendTypeView: View {
+    @ObservedObject var friendViewModel: FriendsViewModel
     @Binding var selectedType: FriendType?
     let onNext: () -> Void
     
@@ -21,7 +22,10 @@ struct CreateFriendTypeView: View {
                 .padding(.top, 32)
             
             VStack(spacing: 0) {
-                ForEach(FriendType.allCases, id: \.self) { friendType in
+                let existingTypes = Set(friendViewModel.friends.map { $0.typeId })
+                let availableTypes = FriendType.allCases.filter { !existingTypes.contains($0) }
+                
+                ForEach(availableTypes, id: \.self) { friendType in
                     FriendTypeRow(
                         friendType: friendType,
                         isSelected: selectedType == friendType
