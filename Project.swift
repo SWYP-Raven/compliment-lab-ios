@@ -10,6 +10,16 @@ let project = Project(
         base: [
             "CODE_SIGN_ENTITLEMENTS": "ComplimentLab/Config/ComplimentLab.entitlements"
         ],
+        configurations: [
+            .debug(
+                name: "Debug",
+                xcconfig: .relativeToRoot("XCConfig/dev.xcconfig")
+            ),
+            .release(
+                name: "Release",
+                xcconfig: .relativeToRoot("XCConfig/prod.xcconfig")
+            ),
+        ]
     ),
     targets: [
         .target(
@@ -17,6 +27,7 @@ let project = Project(
             destinations: .iOS,
             product: .app,
             bundleId: "com.raven.complimentlab",
+            deploymentTargets: .iOS("18.0"),
             infoPlist: .extendingDefault(
                 with: [
                     "UILaunchScreen": [
@@ -33,6 +44,8 @@ let project = Project(
                         "SUITE-Regular.otf",
                         "SUITE-SemiBold.otf",
                     ],
+                    "CFBundleDisplayName": "칭찬연구소",
+                    "BaseURL": "$(BASE_URL)"
                 ]
             ),
             sources: ["ComplimentLab/Sources/**"],
@@ -55,5 +68,27 @@ let project = Project(
             resources: [],
             dependencies: [.target(name: "ComplimentLab")]
         ),
+    ],
+    schemes: [
+        .scheme(
+            name: "ComplimentLab-Dev",
+            buildAction: .buildAction(targets: [
+                .target("ComplimentLab")
+            ]),
+            runAction: .runAction(configuration: .debug),
+            archiveAction: .archiveAction(configuration: .debug),
+            profileAction: .profileAction(configuration: .debug),
+            analyzeAction: .analyzeAction(configuration: .debug)
+        ),
+        .scheme(
+            name: "ComplimentLab-Prod",
+            buildAction: .buildAction(targets: [
+                .target("ComplimentLab")
+            ]),
+            runAction: .runAction(configuration: .release),
+            archiveAction: .archiveAction(configuration: .release),
+            profileAction: .profileAction(configuration: .release),
+            analyzeAction: .analyzeAction(configuration: .release)
+        )
     ]
 )
