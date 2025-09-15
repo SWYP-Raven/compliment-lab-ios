@@ -22,7 +22,7 @@ struct CreateFriendTypeView: View {
                 .padding(.top, 32)
             
             VStack(spacing: 0) {
-                let existingTypes = Set(friendViewModel.friends.map { $0.typeId })
+                let existingTypes = Set(friendViewModel.friends.map { $0.type })
                 let availableTypes = FriendType.allCases.filter { !existingTypes.contains($0) }
                 
                 ForEach(availableTypes, id: \.self) { friendType in

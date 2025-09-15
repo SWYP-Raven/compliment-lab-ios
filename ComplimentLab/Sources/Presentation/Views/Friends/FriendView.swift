@@ -39,7 +39,7 @@ struct FriendView: View {
                 .padding()
             } else {
                 VStack(alignment: .leading) {
-                    let hasAllTypes = Set(friendViewModel.friends.map { $0.typeId }) == Set(FriendType.allCases)
+                    let hasAllTypes = Set(friendViewModel.friends.map { $0.type }) == Set(FriendType.allCases)
                     
                     if hasAllTypes {
                         HStack {
@@ -104,7 +104,7 @@ struct FriendView: View {
                     List {
                         ForEach(friendViewModel.friends, id: \.self) { friend in
                             HStack {
-                                friend.typeId.emoji
+                                friend.type.emoji
                                     .frame(width: 50, height: 50)
                                 
                                 VStack(alignment: .leading) {

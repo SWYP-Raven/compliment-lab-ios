@@ -42,7 +42,7 @@ final class FriendAPI: FriendUseCase {
                 let response = try decoder.decode(PostFriendResponse.self, from: data)
                 return response.data
             }
-            .catchAndReturn(Friend(id: 0, name: "", typeId: .energetic, lastMessage: LastMessage(message: "", time: Date()), isFirst: false))
+            .catchAndReturn(Friend(id: 0, name: "", type: .energetic, lastMessage: LastMessage(message: "", time: Date()), isFirst: false))
             .observe(on: MainScheduler.instance)
     }
     
