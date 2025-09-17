@@ -104,7 +104,9 @@ final class CalendarViewModel: ObservableObject {
     
     // 달 변경 (주간 달력 모드에서 달이 바뀌면 해당 달의 1일로 주를 초기화)
     func changeMonth(by value: Int) {
-        if let newMonth = calendar.date(byAdding: .month, value: value, to: month) {
+        let minDate = calendar.date(from: DateComponents(year: 2025, month: 9, day: 1))!
+        
+        if let newMonth = calendar.date(byAdding: .month, value: value, to: month), newMonth >= minDate {
             self.month = newMonth
             
             var components = calendar.dateComponents([.year, .month], from: newMonth)

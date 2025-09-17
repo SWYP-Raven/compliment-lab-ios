@@ -44,8 +44,14 @@ struct CalendarView: View {
                         switch new {
                         case 0:
                             // 왼쪽으로 스와이프하여 '이전 달' 페이지에 도달
-                            calendarViewModel.changeMonth(by: -1)
-                            complimentViewModel.fetchMonthlyCompliment(year: calendarViewModel.selectedYear, month: calendarViewModel.selectedMonth)
+                            let minDate = Calendar.current.date(from: DateComponents(year: 2025, month: 9, day: 1))!
+                            
+                            if let newMonth = Calendar.current.date(byAdding: .month, value: -1, to: calendarViewModel.month), newMonth >= minDate {
+                                calendarViewModel.changeMonth(by: -1)
+                                complimentViewModel.fetchMonthlyCompliment(year: calendarViewModel.selectedYear, month: calendarViewModel.selectedMonth)
+                            } else {
+                                toastManager.show(message: "이전의 칭찬은 준비되어 있지 않아요.")
+                            }
                             page = 1
                         case 2:
                             // 오른쪽으로 스와이프하여 '다음 달' 페이지에 도달
