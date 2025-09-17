@@ -31,8 +31,8 @@ let project = Project(
             infoPlist: .extendingDefault(
                 with: [
                     "UILaunchScreen": [
-                        "UIColorName": "pink3",
-                        "UIImageName": "splash",
+                        "UIColorName": "",
+                        "UIImageName": "",
                     ],
                     "UIBackgroundModes": ["remote-notification"],
                     "UIAppFonts": [
