@@ -8,7 +8,12 @@ import PackageDescription
         // Customize the product types for specific package product
         // Default is .staticFramework
         // productTypes: ["Alamofire": .framework,]
-        productTypes: [:]
+        productTypes: [
+            "RxSwift": .framework,
+            "RxCocoa": .framework,
+            "RxRelay": .framework,
+            "Firebase": .framework
+        ]
     )
 #endif
 
@@ -18,5 +23,7 @@ let package = Package(
         // Add your own dependencies here:
         // .package(url: "https://github.com/Alamofire/Alamofire", from: "5.0.0"),
         // You can read more about dependencies here: https://docs.tuist.io/documentation/tuist/dependencies
+        .package(url: "https://github.com/ReactiveX/RxSwift", from: "6.9.0"),
+        .package(url: "https://github.com/firebase/firebase-ios-sdk", from: "12.1.0")
     ]
 )
