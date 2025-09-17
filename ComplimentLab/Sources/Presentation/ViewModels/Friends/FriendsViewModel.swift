@@ -17,7 +17,6 @@ final class FriendsViewModel: ObservableObject {
     @Published var isLoading = true
     
     @Published var showFriendAlert: Bool = false
-    @Published var friendAlertType: FriendAlertType = .deleteFriend
     
     let useCase: FriendUseCase
     let disposeBag = DisposeBag()

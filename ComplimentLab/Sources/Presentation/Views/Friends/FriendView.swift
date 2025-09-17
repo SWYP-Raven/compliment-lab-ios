@@ -138,7 +138,6 @@ struct FriendView: View {
                             .swipeActions(edge: .trailing) {
                                 Button {
                                     friendViewModel.showFriendAlert = true
-                                    friendViewModel.friendAlertType = .deleteFriend
                                     friendViewModel.friend = friend
                                 } label: {
                                     Image("Bin red defalt")
@@ -211,39 +210,6 @@ struct HeaderImageView: View {
     }
 }
 
-enum FriendAlertType {
-    case deleteFriend
-    case createCard
-    
-    var title: String {
-        switch self {
-        case .deleteFriend: "채팅방을 나가시겠습니까?"
-        case .createCard: "이 문장으로 칭찬카드를 만들까요?"
-        }
-    }
-    
-    var subTitle: String {
-        switch self {
-        case .deleteFriend: "칭구와 대화가 모두 사라지며, 복구할 수 없어요"
-        case .createCard: "카드로 만들면 언제든 꺼내볼 수 있어요"
-        }
-    }
-    
-    var confirmTitle: String {
-        switch self {
-        case .deleteFriend: "나가기"
-        case .createCard: "좋아요"
-        }
-    }
-    
-    var confirmColor: Color {
-        switch self {
-        case .deleteFriend: Color.negative
-        case .createCard: Color.blue4
-        }
-    }
-}
-
 struct FriendAlertView: View {
     @ObservedObject var friendViewModel: FriendsViewModel
     
@@ -258,11 +224,11 @@ struct FriendAlertView: View {
             VStack(spacing: 22) {
                 Image("kind")
                 
-                Text(friendViewModel.friendAlertType.title)
+                Text("채팅방을 나가시겠습니까?")
                     .font(.suite(.bold, size: 17))
                     .foregroundStyle(Color.gray8)
                 
-                Text(friendViewModel.friendAlertType.subTitle)
+                Text("칭구와 대화가 모두 사라지며, 복구할 수 없어요")
                     .font(.suite(.medium, size: 14))
                     .foregroundStyle(Color.gray6)
                 
@@ -280,21 +246,17 @@ struct FriendAlertView: View {
                     }
                     
                     Button(action: {
-                        if friendViewModel.friendAlertType == .deleteFriend {
-                            withAnimation {
-                                friendViewModel.deleteFriend(friendId: friendViewModel.friend.id)
-                            }
-                        } else {
-                            
+                        withAnimation {
+                            friendViewModel.deleteFriend(friendId: friendViewModel.friend.id)
                         }
                         friendViewModel.showFriendAlert = false
                     }) {
-                        Text(friendViewModel.friendAlertType.confirmTitle)
+                        Text("나가기")
                             .font(.suite(.semiBold, size: 15))
                             .foregroundStyle(Color.gray0)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(friendViewModel.friendAlertType.confirmColor)
+                            .background(Color.negative)
                             .foregroundColor(.white)
                             .cornerRadius(14)
                     }
