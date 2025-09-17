@@ -152,13 +152,7 @@ struct FriendView: View {
                     .listStyle(.plain)
                 }
                 .customNavigationBar(
-                    rightView: {
-                        Button {
-                            
-                        } label: {
-                            Image("Bin defalt")
-                        }
-                    }
+                    rightView: {}
                 )
             }
         }
