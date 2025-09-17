@@ -28,6 +28,13 @@ final class ComplimentViewModel: ObservableObject {
     }
     
     func fetchMonthlyCompliment(year: Int, month: Int) {
+        let todayYear = Calendar.current.component(.year, from: Date())
+        let todayMonth = Calendar.current.component(.month, from: Date())
+        
+        if year > todayYear || (year == todayYear && month > todayMonth) {
+            return
+        }
+        
         let date = "\(year)-\(String(format: "%02d", month))"
         guard let accessToken = KeychainStorage.shared.getToken()?.accessToken else {
             return
@@ -42,6 +49,13 @@ final class ComplimentViewModel: ObservableObject {
     
     func fetchWeeklyCompliment(weekDates: [CalendarDate]) {
         guard let start = weekDates.first?.date, let end = weekDates.last?.date, let accessToken = KeychainStorage.shared.getToken()?.accessToken else { return }
+        
+        let today = Calendar.current.startOfDay(for: Date())
+        let startDay = Calendar.current.startOfDay(for: start)
+        
+        if startDay > today {
+            return
+        }
         
         useCase.getWeeklyCompliment(
             startDate: DateFormatterManager.shared.apiDate(from: start),
