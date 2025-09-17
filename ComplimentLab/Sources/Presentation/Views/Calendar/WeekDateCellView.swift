@@ -24,7 +24,7 @@ struct WeekDateCellView: View {
         VStack(spacing: 8) {
             // 날짜 텍스트 (버튼 아님)
             switch dateState {
-            case .past, .outsideMonth:
+            case .past:
                 Text("\(calendarDate.day)")
                     .font(.suite(.medium, size: 12))
                     .foregroundStyle(isSameDay ? Color.gray0 : Color.gray6)
@@ -44,32 +44,33 @@ struct WeekDateCellView: View {
                 Text("\(calendarDate.day)")
                     .font(.suite(.medium, size: 12))
                     .foregroundStyle(Color.gray6)
+            case .outsideMonth:
+                if calendarDate.date < Date() {
+                    Text("\(calendarDate.day)")
+                        .font(.suite(.medium, size: 12))
+                        .foregroundStyle(isSameDay ? Color.gray0 : Color.gray6)
+                        .padding(.horizontal, 8)
+                        .background(isSameDay ? Color.blue4 : Color.clear)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                } else if calendarDate.date > Date() {
+                    Text("\(calendarDate.day)")
+                        .font(.suite(.medium, size: 12))
+                        .foregroundStyle(Color.gray6)
+                }
             }
             
             // Circle만 버튼
             Button {
-                if dateState == .future {
+                if dateState == .future || (dateState == .outsideMonth && calendarDate.date > Date()) {
                     toastManager.show(message: "쉿, 미래의 하루는 아직 비밀이에요")
                 } else if dateState == .today && compliment?.isRead == false { // && 아직 확인 안한상태면
                     complimentViewModel.dailyCompliment = compliment
                     calendarViewModel.isButtonTapped = true
                     calendarViewModel.selectDate = calendarDate.date
-                    
-                    if compliment?.isRead == false {
-                        complimentViewModel.patchCompliment(isArchived: compliment!.isArchived, isRead: true, date: calendarDate.date)
-                        
-                        complimentViewModel.dailyCompliment?.isRead = true
-                    }
                 } else {
                     if isSameDay {
                         complimentViewModel.dailyCompliment = compliment
                         calendarViewModel.isButtonTapped = true
-                        
-                        if compliment?.isRead == false {
-                            complimentViewModel.patchCompliment(isArchived: compliment!.isArchived, isRead: true, date: calendarDate.date)
-                            
-                            complimentViewModel.dailyCompliment?.isRead = true
-                        }
                     } else {
                         let compliment = complimentViewModel.complimentList.first { calendarViewModel.isSameDay(date1: $0.date, date2: calendarDate.date )}
                         
@@ -80,7 +81,7 @@ struct WeekDateCellView: View {
                 }
             } label: {
                 switch dateState {
-                case .past, .outsideMonth:
+                case .past:
                     if let compliment = compliment {
                         if compliment.isRead {
                             Circle()
@@ -108,6 +109,20 @@ struct WeekDateCellView: View {
                     }
                 case .future:
                     Circle().fill(Color.gray1)
+                case .outsideMonth:
+                    if calendarDate.date < Date() {
+                        if let compliment = compliment {
+                            if compliment.isRead {
+                                Circle()
+                                    .fill(compliment.compliment.type.color2)
+                                    .overlay(compliment.compliment.type.stickerSImage)
+                            } else {
+                                Circle().fill(Color.gray3)
+                            }
+                        }
+                    } else if calendarDate.date > Date() {
+                        Circle().fill(Color.gray1)
+                    }
                 }
             }
         }

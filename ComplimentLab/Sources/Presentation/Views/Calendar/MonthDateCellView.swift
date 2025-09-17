@@ -55,12 +55,6 @@ struct MonthDateCellView: View {
                         calendarViewModel.selectDate = calendarDate.date
                         complimentViewModel.dailyCompliment = compliment
                         calendarViewModel.isButtonTapped = true
-                        
-                        if compliment?.isRead == false {
-                            complimentViewModel.patchCompliment(isArchived: compliment!.isArchived, isRead: true, date: calendarDate.date)
-                            
-                            complimentViewModel.dailyCompliment?.isRead = true
-                        }
                     }
                 } else {
                     if calendarDate.date < calendarViewModel.month {

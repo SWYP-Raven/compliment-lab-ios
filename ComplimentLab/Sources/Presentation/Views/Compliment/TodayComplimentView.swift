@@ -15,7 +15,7 @@ struct TodayComplimentView: View {
     
     var body: some View {
         ZStack {
-            if let dailyCompliment = complimentViewModel.dailyCompliment {
+            if var dailyCompliment = complimentViewModel.dailyCompliment {
                 // 배경
                 dailyCompliment.compliment.type.color1
                     .ignoresSafeArea()
@@ -121,6 +121,10 @@ struct TodayComplimentView: View {
                     
                     if isToday && !dailyCompliment.isRead {
                         toastManager.show(message: "글자를 눌러 직접 입력해 보세요")
+                        
+                        complimentViewModel.patchCompliment(isArchived: dailyCompliment.isArchived, isRead: true, date: calendarViewModel.selectDate)
+                        
+                        dailyCompliment.isRead = true
                     }
                 }
                 .customNavigationBar(
