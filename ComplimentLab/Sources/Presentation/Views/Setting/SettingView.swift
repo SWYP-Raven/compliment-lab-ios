@@ -158,6 +158,11 @@ struct NicknameEditView: View {
                 TextField("10글자 이내로 설정해주세요", text: $text)
                     .font(.suite(.bold, size: 17))
                     .focused($isFocused)
+                    .onChange(of: text) { _, newValue in
+                        if newValue.count > 10 {
+                            text = String(newValue.prefix(10))
+                        }
+                    }
                 
                 Button {
                     text = ""
@@ -184,8 +189,7 @@ struct NicknameEditView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 14))
             }
             .buttonStyle(PlainButtonStyle())
-            .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines)
-.isEmpty)
+            .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 22)
