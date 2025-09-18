@@ -12,14 +12,19 @@ import RxSwift
 @MainActor
 final class LoginViewModel: ObservableObject {
     @Published var isSignup: Bool?
-    @Published var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
     @Published var hasToken: Bool = KeychainStorage.shared.hasToken()
+    @Published var username: String = UserDefaults.standard.string(forKey: "username") ?? "" {
+        didSet {
+            UserDefaults.standard.set(username, forKey: "username")
+        }
+    }
     
     let useCase: LoginUseCase
     let disposeBag = DisposeBag()
     
     init(useCase: LoginUseCase) {
         self.useCase = useCase
+        self.fetchUserIfNeeded()
     }
     
     func loginWithApple(identityToken: String) {
@@ -53,6 +58,14 @@ final class LoginViewModel: ObservableObject {
                     accessToken: loginResponse.data.accessToken,
                     refreshToken: loginResponse.data.refreshToken
                 )
+                
+                if loginResponse.data.isSignup {
+                    self?.useCase.getUser(token: loginResponse.data.accessToken)
+                        .subscribe(onNext: { user in
+                            self?.username = user.nickname
+                        })
+                        .disposed(by: self!.disposeBag)
+                }
             }
         }.resume()
     }
@@ -80,7 +93,6 @@ final class LoginViewModel: ObservableObject {
         useCase.editUser(editUserDTO: editUserDTO, token: accessToken)
             .subscribe(
                 onNext: {
-                    UserDefaults.standard.set(nickname, forKey: "username")
                     self.username = nickname
                     print("닉네임 변경 성공")
                 },
@@ -112,5 +124,19 @@ final class LoginViewModel: ObservableObject {
                 }
             )
             .disposed(by: disposeBag)
+    }
+    
+    func fetchUserIfNeeded() {
+        guard let accessToken = KeychainStorage.shared.getToken()?.accessToken else {
+            return
+        }
+        
+        if UserDefaults.standard.string(forKey: "nickname") == nil {
+            useCase.getUser(token: accessToken)
+                .subscribe(onNext: { [weak self] user in
+                    self?.username = user.nickname
+                })
+                .disposed(by: disposeBag)
+        }
     }
 }
