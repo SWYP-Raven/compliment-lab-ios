@@ -5,17 +5,17 @@
 //  Created by CatSlave on 9/1/25.
 //
 
-import SwiftUI
+import Foundation
 import RxSwift
 
 @MainActor
 final class ChatingViewModel: ObservableObject {
     @Published var chats: [Chat] = []
     @Published var didLoad = false
-    @Published var makeCard = false
-    @Published var cards: [Card] = []
-    @Published var card: Card = Card(id: 0, chatId: 0, type: .energetic, message: "", role: .ASSISTANT, createdAt: Date())
     
+    @Published var card: Card = Card(id: 0, chatId: 0, type: .energetic, message: "", role: .ASSISTANT, createdAt: Date())
+    @Published var cards: [Card] = []
+    @Published var makeCard = false
     @Published var showCardAlert: Bool = false
     
     var createCardDTO: CreateCardDTO = CreateCardDTO(chatId: 0, message: "", role: .ASSISTANT)
