@@ -131,7 +131,7 @@ final class LoginViewModel: ObservableObject {
             return
         }
         
-        if UserDefaults.standard.string(forKey: "nickname") == nil {
+        if UserDefaults.standard.string(forKey: "username") == nil {
             useCase.getUser(token: accessToken)
                 .subscribe(onNext: { [weak self] user in
                     self?.username = user.nickname
