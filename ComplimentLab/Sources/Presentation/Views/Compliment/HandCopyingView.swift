@@ -63,7 +63,9 @@ struct HandCopyingView: View {
                 VStack {
                     HandCopyingSuccessView(complimentViewModel: complimentViewModel)
                 }
+                .transition(.scale.combined(with: .opacity))
             }
         }
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: complimentViewModel.copyingSuccess)
     }
 }
