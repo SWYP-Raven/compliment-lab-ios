@@ -50,7 +50,7 @@ struct CalendarView: View {
                                 calendarViewModel.changeMonth(by: -1)
                                 complimentViewModel.fetchMonthlyCompliment(year: calendarViewModel.selectedYear, month: calendarViewModel.selectedMonth)
                             } else {
-                                toastManager.show(message: "이전의 칭찬은 준비되어 있지 않아요.")
+                                toastManager.show(message: "이전의 칭찬은 준비되어 있지 않아요")
                             }
                             page = 1
                         case 2:
@@ -77,8 +77,16 @@ struct CalendarView: View {
                     .onChange(of: page) { _, new in
                         switch new {
                         case 0:
-                            calendarViewModel.changeWeek(by: -1)
-                            complimentViewModel.fetchWeeklyCompliment(weekDates: calendarViewModel.weekDates)
+                            let minDate = Calendar.current.date(from: DateComponents(year: 2025, month: 9, day: 1))!
+                            
+                            if let newWeek = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: calendarViewModel.week) {
+                                if newWeek >= minDate {
+                                    calendarViewModel.changeWeek(by: -1)
+                                    complimentViewModel.fetchWeeklyCompliment(weekDates: calendarViewModel.weekDates)
+                                } else {
+                                    toastManager.show(message: "이전의 칭찬은 준비되어 있지 않아요")
+                                }
+                            }
                             page = 1
                             
                         case 2:
