@@ -2,7 +2,7 @@
 //  AccountManagementView.swift
 //  ComplimentLab
 //
-//  Created by wayblemac02 on 9/2/25.
+//  Created by 이인호 on 9/2/25.
 //
 
 import SwiftUI
@@ -25,7 +25,9 @@ struct AccountManagementView: View {
                     Spacer()
                     Button {
                         alertType = .logout
-                        showAlert = true
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showAlert = true
+                        }
                     } label: {
                         Text("로그아웃")
                             .font(.suite(.medium, size: 12))
@@ -42,7 +44,9 @@ struct AccountManagementView: View {
                     Spacer()
                     Button {
                         alertType = .withdraw
-                        showAlert = true
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showAlert = true
+                        }
                     } label: {
                         Text("회원탈퇴")
                             .font(.suite(.medium, size: 12))
@@ -64,7 +68,12 @@ struct AccountManagementView: View {
                 }
             )
             
-            CustomAlertView(showAlert: $showAlert, type: alertType)
+            if showAlert {
+                Color.backgroundGray
+                    .edgesIgnoringSafeArea(.all)
+                
+                CustomAlertView(showAlert: $showAlert, type: alertType)
+            }
         }
     }
 }
@@ -101,62 +110,54 @@ struct CustomAlertView: View {
     let type: AlertType
     
     var body: some View {
-        if showAlert {
-            Color.backgroundGray
-                .edgesIgnoringSafeArea(.all)
-                .onTapGesture {
-                    showAlert = false
-                }
+        VStack(alignment: .leading, spacing: 22) {
+            Text(type.title)
+                .font(.suite(.bold, size: 17))
+                .foregroundStyle(Color.gray8)
             
-            VStack(alignment: .leading, spacing: 22) {
-                Text(type.title)
-                    .font(.suite(.bold, size: 17))
-                    .foregroundStyle(Color.gray8)
-                
-                if type == .withdraw {
-                    Text("탈퇴 시 저장하신 내용과 대화는 모두 삭제되며, 복구가 불가능해요")
-                        .font(.suite(.medium, size: 14))
-                        .foregroundStyle(Color.gray6)
+            if type == .withdraw {
+                Text("탈퇴 시 저장하신 내용과 대화는 모두 삭제되며, 복구가 불가능해요")
+                    .font(.suite(.medium, size: 14))
+                    .foregroundStyle(Color.gray6)
+            }
+            
+            HStack {
+                Button(action: {
+                    showAlert = false
+                }) {
+                    Text("취소")
+                        .font(.suite(.semiBold, size: 15))
+                        .foregroundStyle(Color.gray8)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray2)
+                        .cornerRadius(14)
                 }
                 
-                HStack {
-                    Button(action: {
-                        showAlert = false
-                    }) {
-                        Text("취소")
-                            .font(.suite(.semiBold, size: 15))
-                            .foregroundStyle(Color.gray8)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.gray2)
-                            .cornerRadius(14)
+                Button(action: {
+                    if type == .logout {
+                        loginViewModel.logout()
+                    } else {
+                        loginViewModel.deleteUser()
                     }
-                    
-                    Button(action: {
-                        if type == .logout {
-                            loginViewModel.logout()
-                        } else {
-                            loginViewModel.deleteUser()
-                        }
-                        showAlert = false
-                    }) {
-                        Text(type.confirmTitle)
-                            .font(.suite(.semiBold, size: 15))
-                            .foregroundStyle(Color.gray0)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(type.confirmColor)
-                            .foregroundColor(.white)
-                            .cornerRadius(14)
-                    }
+                    showAlert = false
+                }) {
+                    Text(type.confirmTitle)
+                        .font(.suite(.semiBold, size: 15))
+                        .foregroundStyle(Color.gray0)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(type.confirmColor)
+                        .foregroundColor(.white)
+                        .cornerRadius(14)
                 }
             }
-            .padding(.vertical, 25)
-            .padding(.horizontal, 17)
-            .background(Color.gray0)
-            .cornerRadius(15)
-            .shadow(radius: 15)
-            .padding(.horizontal, 20)
         }
+        .padding(.vertical, 25)
+        .padding(.horizontal, 17)
+        .background(Color.gray0)
+        .cornerRadius(15)
+        .shadow(radius: 15)
+        .padding(.horizontal, 20)
     }
 }
