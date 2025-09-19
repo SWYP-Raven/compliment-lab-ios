@@ -2,7 +2,7 @@
 //  User.swift
 //  ComplimentLab
 //
-//  Created by wayblemac02 on 9/18/25.
+//  Created by 이인호 on 9/18/25.
 //
 
 import Foundation
