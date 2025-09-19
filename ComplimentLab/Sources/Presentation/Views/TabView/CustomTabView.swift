@@ -11,7 +11,7 @@ struct CustomTabView: View {
     @StateObject var calendarViewModel = CalendarViewModel()
     @StateObject var complimentViewModel = ComplimentViewModel(useCase: ComplimentAPI())
     @StateObject var archiveViewModel = ArchiveViewModel(useCase: ComplimentAPI(), chatUseCase: ChatAPI())
-    @StateObject var friendsViewModel = FriendsViewModel(useCase: FriendAPI())
+    @StateObject var friendViewModel = FriendViewModel(useCase: FriendAPI())
     @State private var selection = 0
     @State private var showCreateFriends = false
     
@@ -40,7 +40,7 @@ struct CustomTabView: View {
                         }
                         .tag(0)
                     
-                    FriendView(friendViewModel: friendsViewModel, selection: $selection)
+                    FriendView(friendViewModel: friendViewModel, selection: $selection)
                         .tabItem {
                             selection == 1 ? Image("Chat Pressed") : Image("Chat Default")
                             Text("칭구")
@@ -74,7 +74,12 @@ struct CustomTabView: View {
                         .padding(35)
                 }
                 
-                FriendAlertView(friendViewModel: friendsViewModel)
+                if friendViewModel.showFriendAlert {
+                    Color.backgroundGray
+                        .edgesIgnoringSafeArea(.all)
+                    
+                    FriendAlertView(friendViewModel: friendViewModel)
+                }
             }
             .navigationDestination(isPresented: $calendarViewModel.isButtonTapped) {
                 TodayComplimentView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel)

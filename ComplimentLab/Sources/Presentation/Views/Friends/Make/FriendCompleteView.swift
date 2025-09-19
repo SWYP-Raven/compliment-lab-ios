@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FriendCompleteView: View {
     @EnvironmentObject var loginViewModel: LoginViewModel
-    @ObservedObject var friendViewModel: FriendsViewModel
+    @ObservedObject var friendViewModel: FriendViewModel
     @Binding var showCompleteView: Bool
     @Binding var showCreateFriends: Bool
     @Environment(\.dismiss) var dismiss
