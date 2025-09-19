@@ -166,13 +166,16 @@ struct FlowerView: View {
                 .scaledToFit()
                 .frame(height: 260)
                 .overlay(
-                    VStack {
-                        Text(DateFormatterManager.shared.monthEnglish(from: date))
-                            .font(.suite(.bold, size: 17))
-                            .foregroundStyle(Color.gray6)
+                    ZStack {
                         Text(DateFormatterManager.shared.day(from: date))
                             .font(.suite(.heavy, size: 128))
                             .foregroundStyle(Color.gray10)
+                            .offset(y: 20)
+                        
+                        Text(DateFormatterManager.shared.monthEnglish(from: date))
+                            .font(.suite(.bold, size: 17))
+                            .foregroundStyle(Color.gray6)
+                            .offset(y: -60)
                     },
                     alignment: .center
                 )
