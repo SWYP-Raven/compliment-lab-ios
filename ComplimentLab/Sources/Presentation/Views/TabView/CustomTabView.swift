@@ -25,6 +25,8 @@ struct CustomTabView: View {
             .font: UIFont(name: "SUITE-Medium", size: 12)!,
             .foregroundColor: UIColor(Color.gray9)
         ], for: .selected)
+        
+        UITabBar.appearance().scrollEdgeAppearance = .init()
     }
     
     var body: some View {
