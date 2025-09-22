@@ -50,7 +50,7 @@ struct CalendarView: View {
                                 calendarViewModel.changeMonth(by: -1)
                                 complimentViewModel.fetchMonthlyCompliment(year: calendarViewModel.selectedYear, month: calendarViewModel.selectedMonth)
                             } else {
-                                toastManager.show(message: "이전의 칭찬은 준비되어 있지 않아요")
+                                toastManager.show(message: "오늘의 칭찬은 9월부터 함께하고 있어요")
                             }
                             page = 1
                         case 2:
@@ -84,7 +84,7 @@ struct CalendarView: View {
                                     calendarViewModel.changeWeek(by: -1)
                                     complimentViewModel.fetchWeeklyCompliment(weekDates: calendarViewModel.weekDates)
                                 } else {
-                                    toastManager.show(message: "이전의 칭찬은 준비되어 있지 않아요")
+                                    toastManager.show(message: "오늘의 칭찬은 9월부터 함께하고 있어요")
                                 }
                             }
                             page = 1
