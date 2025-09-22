@@ -22,6 +22,7 @@ struct SettingAlertView: View {
                     Text(firstItems[index])
                         .font(.suite(.bold, size: 17))
                 }
+                .tint(Color.blue4)
             }
             
             Divider()
@@ -31,6 +32,7 @@ struct SettingAlertView: View {
                     Text(secondItems[index])
                         .font(.suite(.bold, size: 17))
                 }
+                .tint(Color.blue4)
             }
             
             Spacer()
