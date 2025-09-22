@@ -52,8 +52,12 @@ struct CalendarGridView: View {
                     Spacer()
                     Button {
                         let changedArchived = !dailyCompliment.isArchived
-                        complimentViewModel.toggleArchive()
                         complimentViewModel.patchCompliment(isArchived: changedArchived, isRead: dailyCompliment.isRead, date: dailyCompliment.date)
+                        
+                        // 주간 배열에서도 아카이브 정보를 바꿔줘야함
+                        if let index = complimentViewModel.complimentList.firstIndex(where: { calendarViewModel.isSameDay(date1: $0.date, date2: dailyCompliment.date)}) {
+                            complimentViewModel.complimentList[index].isArchived = changedArchived
+                        }
                     } label: {
                         ZStack {
                             Image("Flower Default Default")

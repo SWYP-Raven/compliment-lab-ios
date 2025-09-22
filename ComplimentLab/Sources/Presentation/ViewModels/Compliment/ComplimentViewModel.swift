@@ -82,6 +82,8 @@ final class ComplimentViewModel: ObservableObject {
             .subscribe(
                 onNext: {
                     print("PATCH 성공!")
+                    self.dailyCompliment?.isRead = isRead
+                    self.dailyCompliment?.isArchived = isArchived
                 },
                 onError: { error in
                     print("PATCH 실패: \(error)")
