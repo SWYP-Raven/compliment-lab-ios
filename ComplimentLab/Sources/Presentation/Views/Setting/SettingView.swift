@@ -15,13 +15,14 @@ enum SettingItem: String, CaseIterable {
 
 struct SettingView: View {
     @EnvironmentObject var loginViewModel: LoginViewModel
+    @StateObject private var toastManager = ToastManager()
     @State private var isSheetPresented: Bool = false
     @Environment(\.dismiss) var dismiss
     var showBackButton: Bool = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 32) {
-            SettingNicknameView()
+            SettingNicknameView(toastManager: toastManager)
             
             Divider()
                 .frame(height: 10)
@@ -57,7 +58,7 @@ struct SettingView: View {
                         Text("앱 버전 정보")
                             .font(.suite(.bold, size: 17))
                             .foregroundStyle(Color.gray8)
-                        Text("V1.0.0")
+                        Text("V1.0.1")
                             .font(.suite(.medium, size: 12))
                             .foregroundStyle(Color.gray6)
                         Spacer()
@@ -70,6 +71,7 @@ struct SettingView: View {
             .scrollDisabled(true)
             .padding(.horizontal, 20)
         }
+        .toast(manager: toastManager)
         .customNavigationBar(
             leftView: {
                 if showBackButton {
@@ -104,6 +106,7 @@ struct SettingRow: View {
 
 struct SettingNicknameView: View {
     @EnvironmentObject var loginViewModel: LoginViewModel
+    @ObservedObject var toastManager: ToastManager
     @State private var isSheetPresented: Bool = false
     
     var body: some View {
@@ -134,7 +137,7 @@ struct SettingNicknameView: View {
         }
         .padding(.horizontal, 20)
         .sheet(isPresented: $isSheetPresented) {
-            NicknameEditView()
+            NicknameEditView(toastManager: toastManager)
                 .presentationDragIndicator(.visible)
                 .presentationDetents([.fraction(0.3)])
         }
@@ -143,6 +146,7 @@ struct SettingNicknameView: View {
 
 struct NicknameEditView: View {
     @EnvironmentObject var loginViewModel: LoginViewModel
+    @ObservedObject var toastManager: ToastManager
     @FocusState private var isFocused: Bool
     @State private var text: String = ""
     @Environment(\.dismiss) var dismiss
@@ -161,6 +165,7 @@ struct NicknameEditView: View {
                     .onChange(of: text) { _, newValue in
                         if newValue.count > 10 {
                             text = String(newValue.prefix(10))
+                            toastManager.show(message: "닉네임은 최대 10글자예요")
                         }
                     }
                 
