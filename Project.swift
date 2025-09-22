@@ -55,7 +55,8 @@ let project = Project(
                 .external(name: "RxSwift"),
                 .external(name: "RxCocoa"),
                 .external(name: "RxRelay"),
-                .external(name: "FirebaseMessaging")
+                .external(name: "FirebaseMessaging"),
+                .external(name: "Lottie")
             ]
         ),
         .target(
