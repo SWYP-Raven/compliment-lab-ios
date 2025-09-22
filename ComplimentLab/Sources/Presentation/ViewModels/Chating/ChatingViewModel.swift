@@ -16,7 +16,8 @@ final class ChatingViewModel: ObservableObject {
     @Published var card: Card = Card(id: 0, chatId: 0, type: .energetic, message: "", role: .ASSISTANT, createdAt: Date())
     @Published var cards: [Card] = []
     @Published var makeCard = false
-    @Published var showCardAlert: Bool = false
+    @Published var showCardAlert = false
+    @Published var isAwaitingResponse = false
     
     var createCardDTO: CreateCardDTO = CreateCardDTO(chatId: 0, message: "", role: .ASSISTANT)
     
@@ -37,9 +38,14 @@ final class ChatingViewModel: ObservableObject {
         let chat = Chat(id: chats.last!.id + 1, time: Date(), message: message, name: "", role: .USER)
         chats.append(chat)
         
+        isAwaitingResponse = true
+        
         useCase.postChat(createChatDTO: createChatDTO, friendId: friendId, token: accessToken)
             .subscribe(onNext: { [weak self] item in
                 self?.chats.append(item)
+                self?.isAwaitingResponse = false
+            }, onError: { [weak self] _ in
+                self?.isAwaitingResponse = false
             })
             .disposed(by: disposeBag)
     }

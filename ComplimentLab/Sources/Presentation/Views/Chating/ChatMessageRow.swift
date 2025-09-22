@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Lottie
 
 struct ChatMessageRow: View {
     @ObservedObject var chatingViewModel: ChatingViewModel
@@ -29,27 +30,44 @@ struct ChatMessageRow: View {
                         .resizable()
                         .frame(width: 35, height: 35)
                     
-                    Text(chat.message)
-                        .padding()
-                        .font(.suite(.medium, size: 14))
-                        .background(Color.gray1)
-                        .clipShape(
-                            UnevenRoundedRectangle(
-                                topLeadingRadius: 0,
-                                bottomLeadingRadius: 15,
-                                bottomTrailingRadius: 15,
-                                topTrailingRadius: 15
+                    if chatingViewModel.isAwaitingResponse {
+                        // 로티이미지
+                        LottieView(name: "", bundle: .main)
+                            .playbackMode(.playing(.toProgress(1, loopMode: .loop)))
+                            .frame(width: 200, height: 200)
+                            .padding()
+                            .background(Color.gray1)
+                            .clipShape(
+                                UnevenRoundedRectangle(
+                                    topLeadingRadius: 0,
+                                    bottomLeadingRadius: 15,
+                                    bottomTrailingRadius: 15,
+                                    topTrailingRadius: 15
+                                )
                             )
-                        )
-                    
-                    if isLast {
-                        VStack {
-                            Spacer()
-                            Button {
-                                chatingViewModel.showCardAlert = true
-                                chatingViewModel.createCardDTO = CreateCardDTO(chatId: chat.id, message: chat.message, role: chat.role)
-                            } label: {
-                                friendType.cardMake
+                    } else {
+                        Text(chat.message)
+                            .padding()
+                            .font(.suite(.medium, size: 14))
+                            .background(Color.gray1)
+                            .clipShape(
+                                UnevenRoundedRectangle(
+                                    topLeadingRadius: 0,
+                                    bottomLeadingRadius: 15,
+                                    bottomTrailingRadius: 15,
+                                    topTrailingRadius: 15
+                                )
+                            )
+                        
+                        if isLast {
+                            VStack {
+                                Spacer()
+                                Button {
+                                    chatingViewModel.showCardAlert = true
+                                    chatingViewModel.createCardDTO = CreateCardDTO(chatId: chat.id, message: chat.message, role: chat.role)
+                                } label: {
+                                    friendType.cardMake
+                                }
                             }
                         }
                     }
