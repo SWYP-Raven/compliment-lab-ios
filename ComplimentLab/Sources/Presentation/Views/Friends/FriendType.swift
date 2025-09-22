@@ -210,6 +210,21 @@ enum FriendType: String, CaseIterable, Codable {
         }
     }
     
+    var cardShare: Image {
+        switch self {
+        case .kind:
+            return Image("Card share Pink")
+        case .energetic:
+            return Image("Card share Yellow")
+        case .studious:
+            return Image("Card share Violet")
+        case .special:
+            return Image("Card share Green")
+        case .quiet:
+            return Image("Card share Blue")
+        }
+    }
+    
     var chatIntroduceImage: Image {
         switch self {
         case .kind:
