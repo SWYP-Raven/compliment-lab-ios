@@ -30,49 +30,51 @@ struct ChatMessageRow: View {
                         .resizable()
                         .frame(width: 35, height: 35)
                     
-                    if chatingViewModel.isAwaitingResponse {
-                        // 로티이미지
-                        LottieView(name: "", bundle: .main)
-                            .playbackMode(.playing(.toProgress(1, loopMode: .loop)))
-                            .frame(width: 200, height: 200)
-                            .padding()
-                            .background(Color.gray1)
-                            .clipShape(
-                                UnevenRoundedRectangle(
-                                    topLeadingRadius: 0,
-                                    bottomLeadingRadius: 15,
-                                    bottomTrailingRadius: 15,
-                                    topTrailingRadius: 15
-                                )
+                    Text(chat.message)
+                        .padding()
+                        .font(.suite(.medium, size: 14))
+                        .background(Color.gray1)
+                        .clipShape(
+                            UnevenRoundedRectangle(
+                                topLeadingRadius: 0,
+                                bottomLeadingRadius: 15,
+                                bottomTrailingRadius: 15,
+                                topTrailingRadius: 15
                             )
-                    } else {
-                        Text(chat.message)
-                            .padding()
-                            .font(.suite(.medium, size: 14))
-                            .background(Color.gray1)
-                            .clipShape(
-                                UnevenRoundedRectangle(
-                                    topLeadingRadius: 0,
-                                    bottomLeadingRadius: 15,
-                                    bottomTrailingRadius: 15,
-                                    topTrailingRadius: 15
-                                )
-                            )
-                        
-                        if isLast {
-                            VStack {
-                                Spacer()
-                                Button {
-                                    chatingViewModel.showCardAlert = true
-                                    chatingViewModel.createCardDTO = CreateCardDTO(chatId: chat.id, message: chat.message, role: chat.role)
-                                } label: {
-                                    friendType.cardMake
-                                }
+                        )
+                    
+                    if isLast {
+                        VStack {
+                            Spacer()
+                            Button {
+                                chatingViewModel.showCardAlert = true
+                                chatingViewModel.createCardDTO = CreateCardDTO(chatId: chat.id, message: chat.message, role: chat.role)
+                            } label: {
+                                friendType.cardMake
                             }
                         }
                     }
                 }
-                
+            } else if chat.role == .LOADING {
+                HStack(alignment: .top) {
+                    friendType.emoji
+                        .resizable()
+                        .frame(width: 35, height: 35)
+                    
+                    LottieView(animation: .named(friendType.lottieAnimation))
+                        .playing(loopMode: .loop)
+                        .frame(width: 50, height: 40)
+                        .padding(.vertical, -2)
+                        .background(Color.gray1)
+                        .clipShape(
+                            UnevenRoundedRectangle(
+                                topLeadingRadius: 0,
+                                bottomLeadingRadius: 15,
+                                bottomTrailingRadius: 15,
+                                topTrailingRadius: 15
+                            )
+                        )
+                }
             } else {
                 Text(chat.message)
                     .padding()
@@ -88,7 +90,7 @@ struct ChatMessageRow: View {
                     )
             }
             
-            if chat.role == .ASSISTANT {
+            if chat.role == .ASSISTANT || chat.role == .LOADING {
                 Spacer()
                 Spacer()
                 Spacer()

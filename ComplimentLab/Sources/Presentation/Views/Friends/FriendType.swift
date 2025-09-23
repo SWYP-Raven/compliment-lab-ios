@@ -269,4 +269,19 @@ enum FriendType: String, CaseIterable, Codable {
             return Image("flower blue")
         }
     }
+    
+    var lottieAnimation: String {
+        switch self {
+        case .kind:
+            "dot loading pink"
+        case .energetic:
+            "dot loading yellow"
+        case .studious:
+            "dot loading violet"
+        case .special:
+            "dot loading green"
+        case .quiet:
+            "dot loading blue"
+        }
+    }
 }
