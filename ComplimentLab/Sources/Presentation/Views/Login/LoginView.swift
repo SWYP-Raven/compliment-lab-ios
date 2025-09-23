@@ -9,12 +9,10 @@ import SwiftUI
 import AuthenticationServices
 
 struct LoginView: View {
-    @ObservedObject var loginViewModel: LoginViewModel
+    @EnvironmentObject var loginViewModel: LoginViewModel
     @State private var currentPage = 0
     @State private var appleLoginCoordinator = AppleLoginManager()
     @State private var showAgreeView: Bool = false
-    @State private var naviToProfileEdit = false
-    @State private var navigateToMain = false
     private let totalPages = 3
     private var isLogin: Bool { currentPage == 2 }
     
@@ -26,7 +24,7 @@ struct LoginView: View {
                 if showAgreeView {
                     AgreeModalView(isPresented: $showAgreeView) {
                         AgreementView(onAgreementCompleted: {
-                            naviToProfileEdit = true
+                            loginViewModel.naviToProfileEdit = true
                         })
                     }
                 }
@@ -37,14 +35,13 @@ struct LoginView: View {
             }
             .onReceive(loginViewModel.$isSignup) { isSignup in
                 guard let isSignup else { return }
-                if isSignup {
-                    navigateToMain = true
-                } else {
-                    naviToProfileEdit = true
+                
+                if !isSignup {
+                    loginViewModel.naviToProfileEdit = true
                 }
             }
-            .navigationDestination(isPresented: $naviToProfileEdit) {
-                ProfileSetupView(profileSetupViewModel: .init())
+            .navigationDestination(isPresented: $loginViewModel.naviToProfileEdit) {
+                ProfileSetupView()
             }
         }
         .toolbarVisibility(.hidden, for: .navigationBar)

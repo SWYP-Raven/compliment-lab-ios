@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct ProfileSetupView: View {
-    @ObservedObject var profileSetupViewModel: ProfileSetupViewModel
+    @EnvironmentObject var loginViewModel: LoginViewModel
     @StateObject private var toastManager = ToastManager()
     @State private var nickname: String = ""
     @State private var showToast = false
-    @State private var navigateToMain = false
     @FocusState private var isTextFieldFocused: Bool
+    @Environment(\.dismiss) private var dismiss
     
     private let maxLength = 10
     
@@ -74,7 +74,7 @@ struct ProfileSetupView: View {
             Spacer()
 
             Button(action: {
-                profileSetupViewModel.requestSetProfile(name: nickname)
+                loginViewModel.requestSetProfile(name: nickname)
             }) {
                 Text("칭찬연구소 입장하기")
                     .font(.suite(.bold, size: 17))
@@ -97,17 +97,10 @@ struct ProfileSetupView: View {
         }
         .background(Color.white)
         .toast(manager: toastManager)
-        .onReceive(profileSetupViewModel.$completed) { completed in
+        .onReceive(loginViewModel.$completed) { completed in
             guard completed != nil else { return }
-            navigateToMain = true
-        }
-        .fullScreenCover(isPresented: $navigateToMain) {
-            CustomTabView()
+            loginViewModel.naviToProfileEdit = false
         }
     }
-}
-
-#Preview {
-    ProfileSetupView(profileSetupViewModel: .init())
 }
 

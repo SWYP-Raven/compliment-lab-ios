@@ -8,11 +8,15 @@ public struct ContentView: View {
 
     public var body: some View {
         if isActive {
-            if loginViewModel.hasToken {
-                CustomTabView()
-            } else {
-                LoginView(loginViewModel: loginViewModel)
+            ZStack {
+                if loginViewModel.hasToken {
+                    CustomTabView()
+                } else {
+                    LoginView()
+                        .transition(.move(edge: .trailing))
+                }
             }
+            .animation(.easeInOut(duration: 0.3), value: loginViewModel.hasToken)
         } else {
             PinkGradientSplashView(isActive: $isActive)
         }

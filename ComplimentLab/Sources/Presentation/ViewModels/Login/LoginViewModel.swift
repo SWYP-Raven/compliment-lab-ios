@@ -11,7 +11,9 @@ import RxSwift
 
 @MainActor
 final class LoginViewModel: ObservableObject {
+    @Published var completed: Void?
     @Published var isSignup: Bool?
+    @Published var naviToProfileEdit = false
     @Published var hasToken: Bool = KeychainStorage.shared.hasToken()
     @Published var username: String = UserDefaults.standard.string(forKey: "username") ?? "" {
         didSet {
@@ -19,6 +21,9 @@ final class LoginViewModel: ObservableObject {
         }
     }
     
+    var pendingAccessToken: String?
+    var pendingRefreshToken: String?
+
     let useCase: LoginUseCase
     let disposeBag = DisposeBag()
     
@@ -54,17 +59,24 @@ final class LoginViewModel: ObservableObject {
                 
                 self?.isSignup = loginResponse.data.isSignup
                 
-                self?.saveTokens(
-                    accessToken: loginResponse.data.accessToken,
-                    refreshToken: loginResponse.data.refreshToken
-                )
-                
                 if loginResponse.data.isSignup {
-                    self?.useCase.getUser(token: loginResponse.data.accessToken)
-                        .subscribe(onNext: { user in
-                            self?.username = user.nickname
-                        })
-                        .disposed(by: self!.disposeBag)
+                    self?.saveTokens(
+                        accessToken: loginResponse.data.accessToken,
+                        refreshToken: loginResponse.data.refreshToken
+                    )
+                    
+                    if loginResponse.data.isSignup {
+                        self?.useCase.getUser(token: loginResponse.data.accessToken)
+                            .subscribe(onNext: { user in
+                                self?.username = user.nickname
+                            })
+                            .disposed(by: self!.disposeBag)
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self?.pendingAccessToken = loginResponse.data.accessToken
+                        self?.pendingRefreshToken = loginResponse.data.refreshToken
+                    }
                 }
             }
         }.resume()
@@ -138,5 +150,49 @@ final class LoginViewModel: ObservableObject {
                 })
                 .disposed(by: disposeBag)
         }
+    }
+    
+    func requestSetProfile(name: String) {
+        print(#function, #line, "Path : # ")
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BaseURL") as? String, let url = URL(string: "\(baseURL)/user"),
+        let accessToken = pendingAccessToken else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        let profileRequest = ProfileUpdateRequest(nickname: name)
+        
+        do {
+            request.httpBody = try JSONEncoder().encode(profileRequest)
+        } catch {
+            return
+        }
+        
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            DispatchQueue.main.async {
+                if let data = data {
+                    let dataString = String(data: data, encoding: .utf8) ?? "인코딩 실패"
+                }
+                
+                guard error == nil,
+                      let data,
+                      let response = try? JSONDecoder().decode(ProfileUpdateResponse.self, from: data),
+                      response.success else {
+                    return
+                }
+                
+                if let access = self?.pendingAccessToken, let refresh = self?.pendingRefreshToken {
+                    self?.saveTokens(accessToken: access, refreshToken: refresh)
+                    self?.pendingAccessToken = nil
+                    self?.pendingRefreshToken = nil
+                }
+                self?.username = response.data.nickname
+                self?.completed = ()
+            }
+        }.resume()
     }
 }
