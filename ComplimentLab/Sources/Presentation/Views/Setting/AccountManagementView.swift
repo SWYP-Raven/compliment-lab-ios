@@ -25,7 +25,7 @@ struct AccountManagementView: View {
                     Spacer()
                     Button {
                         alertType = .logout
-                        withAnimation(.easeInOut(duration: 0.2)) {
+                        withAnimation(.easeInOut(duration: 0.25)) {
                             showAlert = true
                         }
                     } label: {
@@ -44,7 +44,7 @@ struct AccountManagementView: View {
                     Spacer()
                     Button {
                         alertType = .withdraw
-                        withAnimation(.easeInOut(duration: 0.2)) {
+                        withAnimation(.easeInOut(duration: 0.25)) {
                             showAlert = true
                         }
                     } label: {
@@ -73,6 +73,8 @@ struct AccountManagementView: View {
                     .edgesIgnoringSafeArea(.all)
                 
                 CustomAlertView(showAlert: $showAlert, type: alertType)
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
+                    .zIndex(1)
             }
         }
     }
