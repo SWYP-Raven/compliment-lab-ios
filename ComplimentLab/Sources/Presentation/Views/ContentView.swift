@@ -11,13 +11,14 @@ public struct ContentView: View {
             ZStack {
                 if loginViewModel.hasToken {
                     CustomTabView()
+                        .onAppear {
+                            loginViewModel.markOnboardingSeenIfNeeded()
+                        }
                 } else {
                     if loginViewModel.hasSeenOnboarding {
                         WelcomeBackView()
-//                            .transition(.move(edge: .trailing))
                     } else {
                         LoginView()
-//                            .transition(.move(edge: .trailing))
                     }
                 }
             }

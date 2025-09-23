@@ -192,11 +192,16 @@ final class LoginViewModel: ObservableObject {
                     self?.pendingAccessToken = nil
                     self?.pendingRefreshToken = nil
                 }
-                UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
-                self?.hasSeenOnboarding = true
                 self?.username = response.data.nickname
                 self?.completed = ()
             }
         }.resume()
+    }
+    
+    func markOnboardingSeenIfNeeded() {
+        if !hasSeenOnboarding {
+            hasSeenOnboarding = true
+            UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+        }
     }
 }

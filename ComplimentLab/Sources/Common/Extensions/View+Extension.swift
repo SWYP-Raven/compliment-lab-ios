@@ -21,7 +21,7 @@ extension View {
     }
     
     func snapshotImage(
-        size: CGSize = .init(width: 335, height: 498),
+        size: CGSize = .init(width: 335, height: 485),
         scale: CGFloat = 3.0
     ) -> Image? {
         let card = self.frame(width: size.width, height: size.height)
