@@ -15,6 +15,7 @@ final class LoginViewModel: ObservableObject {
     @Published var isSignup: Bool?
     @Published var naviToProfileEdit = false
     @Published var hasToken: Bool = KeychainStorage.shared.hasToken()
+    @Published var hasSeenOnboarding: Bool = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
     @Published var username: String = UserDefaults.standard.string(forKey: "username") ?? "" {
         didSet {
             UserDefaults.standard.set(username, forKey: "username")
@@ -129,6 +130,7 @@ final class LoginViewModel: ObservableObject {
                     }
                     KeychainStorage.shared.deleteToken()
                     self.hasToken = false
+                    self.hasSeenOnboarding = false
                     print("유저 탈퇴 성공")
                 },
                 onError: { error in
@@ -190,6 +192,8 @@ final class LoginViewModel: ObservableObject {
                     self?.pendingAccessToken = nil
                     self?.pendingRefreshToken = nil
                 }
+                UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+                self?.hasSeenOnboarding = true
                 self?.username = response.data.nickname
                 self?.completed = ()
             }

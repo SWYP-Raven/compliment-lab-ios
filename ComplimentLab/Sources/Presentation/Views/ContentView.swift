@@ -12,8 +12,13 @@ public struct ContentView: View {
                 if loginViewModel.hasToken {
                     CustomTabView()
                 } else {
-                    LoginView()
-                        .transition(.move(edge: .trailing))
+                    if loginViewModel.hasSeenOnboarding {
+                        WelcomeBackView()
+//                            .transition(.move(edge: .trailing))
+                    } else {
+                        LoginView()
+//                            .transition(.move(edge: .trailing))
+                    }
                 }
             }
             .animation(.easeInOut(duration: 0.3), value: loginViewModel.hasToken)
