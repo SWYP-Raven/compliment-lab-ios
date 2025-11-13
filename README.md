@@ -1,9 +1,7 @@
-<br>
 <div align="center">
   <img src="https://github.com/user-attachments/assets/8c01bcd6-448f-42ae-84dd-6cec272487bd" alt="App Icon" width="250px" height="250px"/>
   <h3>칭찬연구소</h3>
 </div>
-<br>
 
 ## 🌸 Feature
 <table align="center">
