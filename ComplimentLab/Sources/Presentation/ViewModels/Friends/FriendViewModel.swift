@@ -10,14 +10,13 @@ import SwiftUI
 import RxSwift
 
 @MainActor
-final class FriendsViewModel: ObservableObject {
+final class FriendViewModel: ObservableObject {
     @Published var currentPage: FriendFlowPage = .create
     @Published var friends: [Friend] = []
     @Published var friend: Friend = Friend(id: 0, name: "", type: .energetic, lastMessage: LastMessage(message: "", time: Date()), isFirst: false)
     @Published var isLoading = true
     
     @Published var showFriendAlert: Bool = false
-    @Published var friendAlertType: FriendAlertType = .deleteFriend
     
     let useCase: FriendUseCase
     let disposeBag = DisposeBag()

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CreateFriendTypeView: View {
-    @ObservedObject var friendViewModel: FriendsViewModel
+    @ObservedObject var friendViewModel: FriendViewModel
     @Binding var selectedType: FriendType?
     let onNext: () -> Void
     

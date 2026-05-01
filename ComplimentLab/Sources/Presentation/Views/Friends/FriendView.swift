@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FriendView: View {
     @EnvironmentObject var loginViewModel: LoginViewModel
-    @ObservedObject var friendViewModel: FriendsViewModel
+    @ObservedObject var friendViewModel: FriendViewModel
     @State private var showCreateFriends = true
     @Binding var selection: Int
     
@@ -138,7 +138,6 @@ struct FriendView: View {
                             .swipeActions(edge: .trailing) {
                                 Button {
                                     friendViewModel.showFriendAlert = true
-                                    friendViewModel.friendAlertType = .deleteFriend
                                     friendViewModel.friend = friend
                                 } label: {
                                     Image("Bin red defalt")
@@ -152,13 +151,7 @@ struct FriendView: View {
                     .listStyle(.plain)
                 }
                 .customNavigationBar(
-                    rightView: {
-                        Button {
-                            
-                        } label: {
-                            Image("Bin defalt")
-                        }
-                    }
+                    rightView: {}
                 )
             }
         }
@@ -217,101 +210,56 @@ struct HeaderImageView: View {
     }
 }
 
-enum FriendAlertType {
-    case deleteFriend
-    case createCard
-    
-    var title: String {
-        switch self {
-        case .deleteFriend: "채팅방을 나가시겠습니까?"
-        case .createCard: "이 문장으로 칭찬카드를 만들까요?"
-        }
-    }
-    
-    var subTitle: String {
-        switch self {
-        case .deleteFriend: "칭구와 대화가 모두 사라지며, 복구할 수 없어요"
-        case .createCard: "카드로 만들면 언제든 꺼내볼 수 있어요"
-        }
-    }
-    
-    var confirmTitle: String {
-        switch self {
-        case .deleteFriend: "나가기"
-        case .createCard: "좋아요"
-        }
-    }
-    
-    var confirmColor: Color {
-        switch self {
-        case .deleteFriend: Color.negative
-        case .createCard: Color.blue4
-        }
-    }
-}
-
 struct FriendAlertView: View {
-    @ObservedObject var friendViewModel: FriendsViewModel
+    @ObservedObject var friendViewModel: FriendViewModel
     
     var body: some View {
-        if friendViewModel.showFriendAlert {
-            Color.backgroundGray
-                .edgesIgnoringSafeArea(.all)
-                .onTapGesture {
-                    friendViewModel.showFriendAlert = false
-                }
+        VStack(spacing: 22) {
+            Image("kind")
             
-            VStack(spacing: 22) {
-                Image("kind")
+            Text("채팅방을 나가시겠습니까?")
+                .font(.suite(.bold, size: 17))
+                .foregroundStyle(Color.gray8)
+            
+            Text("칭구와 대화가 모두 사라지며, 복구할 수 없어요")
+                .font(.suite(.medium, size: 14))
+                .foregroundStyle(Color.gray6)
+            
+            HStack {
+                Button(action: {
+                    friendViewModel.showFriendAlert = false
+                }) {
+                    Text("취소")
+                        .font(.suite(.semiBold, size: 15))
+                        .foregroundStyle(Color.gray8)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray2)
+                        .cornerRadius(14)
+                }
                 
-                Text(friendViewModel.friendAlertType.title)
-                    .font(.suite(.bold, size: 17))
-                    .foregroundStyle(Color.gray8)
-                
-                Text(friendViewModel.friendAlertType.subTitle)
-                    .font(.suite(.medium, size: 14))
-                    .foregroundStyle(Color.gray6)
-                
-                HStack {
-                    Button(action: {
-                        friendViewModel.showFriendAlert = false
-                    }) {
-                        Text("취소")
-                            .font(.suite(.semiBold, size: 15))
-                            .foregroundStyle(Color.gray8)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.gray2)
-                            .cornerRadius(14)
+                Button(action: {
+                    withAnimation {
+                        friendViewModel.deleteFriend(friendId: friendViewModel.friend.id)
                     }
-                    
-                    Button(action: {
-                        if friendViewModel.friendAlertType == .deleteFriend {
-                            withAnimation {
-                                friendViewModel.deleteFriend(friendId: friendViewModel.friend.id)
-                            }
-                        } else {
-                            
-                        }
-                        friendViewModel.showFriendAlert = false
-                    }) {
-                        Text(friendViewModel.friendAlertType.confirmTitle)
-                            .font(.suite(.semiBold, size: 15))
-                            .foregroundStyle(Color.gray0)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(friendViewModel.friendAlertType.confirmColor)
-                            .foregroundColor(.white)
-                            .cornerRadius(14)
-                    }
+                    friendViewModel.showFriendAlert = false
+                }) {
+                    Text("나가기")
+                        .font(.suite(.semiBold, size: 15))
+                        .foregroundStyle(Color.gray0)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.negative)
+                        .foregroundColor(.white)
+                        .cornerRadius(14)
                 }
             }
-            .padding(.vertical, 25)
-            .padding(.horizontal, 17)
-            .background(Color.gray0)
-            .cornerRadius(15)
-            .shadow(radius: 15)
-            .padding(.horizontal, 20)
         }
+        .padding(.vertical, 25)
+        .padding(.horizontal, 17)
+        .background(Color.gray0)
+        .cornerRadius(15)
+        .shadow(radius: 15)
+        .padding(.horizontal, 20)
     }
 }

@@ -2,7 +2,7 @@
 //  MonthDateCellView.swift
 //  ComplimentLab
 //
-//  Created by wayblemac02 on 9/15/25.
+//  Created by 이인호 on 9/15/25.
 //
 
 import SwiftUI
@@ -55,12 +55,6 @@ struct MonthDateCellView: View {
                         calendarViewModel.selectDate = calendarDate.date
                         complimentViewModel.dailyCompliment = compliment
                         calendarViewModel.isButtonTapped = true
-                        
-                        if compliment?.isRead == false {
-                            complimentViewModel.patchCompliment(isArchived: compliment!.isArchived, isRead: true, date: calendarDate.date)
-                            
-                            complimentViewModel.dailyCompliment?.isRead = true
-                        }
                     }
                 } else {
                     if calendarDate.date < calendarViewModel.month {

@@ -13,7 +13,7 @@ class ToastManager: ObservableObject {
     @Published var message = ""
     private var workItem: DispatchWorkItem?
     
-    func show(message: String, duration: Double = 1.0) {
+    func show(message: String, duration: Double = 1.5) {
         // 기존 작업 취소
         workItem?.cancel()
         

@@ -41,7 +41,7 @@ struct YearMonthPickerView: View {
             
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 3), spacing: 16) {
                 ForEach(months.indices, id: \.self) { index in
-                    if pickerYear == 2025 && index < 7 {
+                    if pickerYear == 2025 && index < 8 {
                         Text(months[index])
                         .font(.suite(.semiBold, size: 15))
                         .foregroundStyle(Color.gray4)
@@ -52,7 +52,11 @@ struct YearMonthPickerView: View {
                         Button {
                             calendarViewModel.changeMonth(year: pickerYear, month: index + 1)
                             
-                            complimentViewModel.fetchMonthlyCompliment(year: calendarViewModel.selectedYear, month: calendarViewModel.selectedMonth)
+                            if calendarViewModel.mode == .month {
+                                complimentViewModel.fetchMonthlyCompliment(year: calendarViewModel.selectedYear, month: calendarViewModel.selectedMonth)
+                            } else {
+                                complimentViewModel.fetchWeeklyCompliment(weekDates: calendarViewModel.weekDates)
+                            }
                             
                             archiveViewModel.getArchivedCompliments(
                                 year: calendarViewModel.selectedYear,

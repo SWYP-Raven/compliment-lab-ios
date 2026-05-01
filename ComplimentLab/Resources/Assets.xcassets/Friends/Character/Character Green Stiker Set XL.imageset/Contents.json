@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Character Green Stiker Set XL.png",
+      "filename" : "Character Green Stiker XL.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Character Green Stiker Set XL@2x.png",
+      "filename" : "Character Green Stiker XL@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Character Green Stiker Set XL@3x.png",
+      "filename" : "Character Green Stiker XL@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

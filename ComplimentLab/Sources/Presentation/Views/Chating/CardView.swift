@@ -22,7 +22,19 @@ struct CardView: View {
                 Spacer()
                 
                 VStack(alignment: .trailing) {
-                    cardShareView()
+                    ZStack {
+                        card.type.card
+                            .shadow(color: Color.black.opacity(0.1),
+                                    radius: 40,
+                                    x: 0,
+                                    y: -3)
+                        
+                        Text(card.message)
+                            .font(.suite(.medium, size: 14))
+                            .frame(width: 137)
+                            .multilineTextAlignment(.center)
+                            .offset(y: -50)
+                    }
 
                     Button {
                         chatingViewModel.deleteCard(id: card.id)
@@ -91,11 +103,9 @@ struct CardView: View {
     @ViewBuilder
     func cardShareView() -> some View {
         ZStack {
-            card.type.card
-                .shadow(color: Color.black.opacity(0.1),
-                        radius: 40,
-                        x: 0,
-                        y: -3)
+            card.type.cardShare
+                .resizable()
+                .scaledToFill()
             
             Text(card.message)
                 .font(.suite(.medium, size: 14))

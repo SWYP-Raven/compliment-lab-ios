@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FriendCreationView: View {
-    @ObservedObject var friendViewModel: FriendsViewModel
+    @ObservedObject var friendViewModel: FriendViewModel
     @Binding var showCreateFriends: Bool
     @State private var currentPage = 0
     @State private var selectedType: FriendType?

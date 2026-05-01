@@ -11,15 +11,26 @@ import RxSwift
 
 @MainActor
 final class LoginViewModel: ObservableObject {
+    @Published var completed: Void?
     @Published var isSignup: Bool?
-    @Published var username: String = UserDefaults.standard.string(forKey: "username") ?? ""
+    @Published var naviToProfileEdit = false
     @Published var hasToken: Bool = KeychainStorage.shared.hasToken()
+    @Published var hasSeenOnboarding: Bool = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
+    @Published var username: String = UserDefaults.standard.string(forKey: "username") ?? "" {
+        didSet {
+            UserDefaults.standard.set(username, forKey: "username")
+        }
+    }
     
+    var pendingAccessToken: String?
+    var pendingRefreshToken: String?
+
     let useCase: LoginUseCase
     let disposeBag = DisposeBag()
     
     init(useCase: LoginUseCase) {
         self.useCase = useCase
+        self.fetchUserIfNeeded()
     }
     
     func loginWithApple(identityToken: String) {
@@ -49,10 +60,25 @@ final class LoginViewModel: ObservableObject {
                 
                 self?.isSignup = loginResponse.data.isSignup
                 
-                self?.saveTokens(
-                    accessToken: loginResponse.data.accessToken,
-                    refreshToken: loginResponse.data.refreshToken
-                )
+                if loginResponse.data.isSignup {
+                    self?.saveTokens(
+                        accessToken: loginResponse.data.accessToken,
+                        refreshToken: loginResponse.data.refreshToken
+                    )
+                    
+                    if loginResponse.data.isSignup {
+                        self?.useCase.getUser(token: loginResponse.data.accessToken)
+                            .subscribe(onNext: { user in
+                                self?.username = user.nickname
+                            })
+                            .disposed(by: self!.disposeBag)
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self?.pendingAccessToken = loginResponse.data.accessToken
+                        self?.pendingRefreshToken = loginResponse.data.refreshToken
+                    }
+                }
             }
         }.resume()
     }
@@ -80,7 +106,6 @@ final class LoginViewModel: ObservableObject {
         useCase.editUser(editUserDTO: editUserDTO, token: accessToken)
             .subscribe(
                 onNext: {
-                    UserDefaults.standard.set(nickname, forKey: "username")
                     self.username = nickname
                     print("닉네임 변경 성공")
                 },
@@ -105,6 +130,7 @@ final class LoginViewModel: ObservableObject {
                     }
                     KeychainStorage.shared.deleteToken()
                     self.hasToken = false
+                    self.hasSeenOnboarding = false
                     print("유저 탈퇴 성공")
                 },
                 onError: { error in
@@ -112,5 +138,70 @@ final class LoginViewModel: ObservableObject {
                 }
             )
             .disposed(by: disposeBag)
+    }
+    
+    func fetchUserIfNeeded() {
+        guard let accessToken = KeychainStorage.shared.getToken()?.accessToken else {
+            return
+        }
+        
+        if UserDefaults.standard.string(forKey: "username") == nil {
+            useCase.getUser(token: accessToken)
+                .subscribe(onNext: { [weak self] user in
+                    self?.username = user.nickname
+                })
+                .disposed(by: disposeBag)
+        }
+    }
+    
+    func requestSetProfile(name: String) {
+        print(#function, #line, "Path : # ")
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BaseURL") as? String, let url = URL(string: "\(baseURL)/user"),
+        let accessToken = pendingAccessToken else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        let profileRequest = ProfileUpdateRequest(nickname: name)
+        
+        do {
+            request.httpBody = try JSONEncoder().encode(profileRequest)
+        } catch {
+            return
+        }
+        
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            DispatchQueue.main.async {
+                if let data = data {
+                    let dataString = String(data: data, encoding: .utf8) ?? "인코딩 실패"
+                }
+                
+                guard error == nil,
+                      let data,
+                      let response = try? JSONDecoder().decode(ProfileUpdateResponse.self, from: data),
+                      response.success else {
+                    return
+                }
+                
+                if let access = self?.pendingAccessToken, let refresh = self?.pendingRefreshToken {
+                    self?.saveTokens(accessToken: access, refreshToken: refresh)
+                    self?.pendingAccessToken = nil
+                    self?.pendingRefreshToken = nil
+                }
+                self?.username = response.data.nickname
+                self?.completed = ()
+            }
+        }.resume()
+    }
+    
+    func markOnboardingSeenIfNeeded() {
+        if !hasSeenOnboarding {
+            hasSeenOnboarding = true
+            UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+        }
     }
 }

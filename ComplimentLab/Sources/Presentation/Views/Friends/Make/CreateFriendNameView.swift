@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CreateFriendNameView: View {
-    @ObservedObject var friendViewModel: FriendsViewModel
+    @ObservedObject var friendViewModel: FriendViewModel
     @StateObject private var toastManager = ToastManager()
     @Binding var friendName: String
     @Binding var showCompleteView: Bool

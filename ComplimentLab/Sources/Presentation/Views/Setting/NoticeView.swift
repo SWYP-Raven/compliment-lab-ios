@@ -2,7 +2,7 @@
 //  NoticeView.swift
 //  ComplimentLab
 //
-//  Created by wayblemac02 on 9/2/25.
+//  Created by 이인호 on 9/2/25.
 //
 
 import SwiftUI

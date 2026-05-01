@@ -69,7 +69,6 @@ struct TodayComplimentView: View {
                         
                         Button {
                             let changedArchived = !dailyCompliment.isArchived
-                            complimentViewModel.toggleArchive()
                             complimentViewModel.patchCompliment(
                                 isArchived: changedArchived,
                                 isRead: dailyCompliment.isRead,
@@ -121,6 +120,8 @@ struct TodayComplimentView: View {
                     
                     if isToday && !dailyCompliment.isRead {
                         toastManager.show(message: "글자를 눌러 직접 입력해 보세요")
+                        
+                        complimentViewModel.patchCompliment(isArchived: dailyCompliment.isArchived, isRead: true, date: calendarViewModel.selectDate)
                     }
                 }
                 .customNavigationBar(
@@ -162,13 +163,16 @@ struct FlowerView: View {
                 .scaledToFit()
                 .frame(height: 260)
                 .overlay(
-                    VStack {
-                        Text(DateFormatterManager.shared.monthEnglish(from: date))
-                            .font(.suite(.bold, size: 17))
-                            .foregroundStyle(Color.gray6)
+                    ZStack {
                         Text(DateFormatterManager.shared.day(from: date))
                             .font(.suite(.heavy, size: 128))
                             .foregroundStyle(Color.gray10)
+                            .offset(y: 20)
+                        
+                        Text(DateFormatterManager.shared.monthEnglish(from: date))
+                            .font(.suite(.bold, size: 17))
+                            .foregroundStyle(Color.gray6)
+                            .offset(y: -60)
                     },
                     alignment: .center
                 )

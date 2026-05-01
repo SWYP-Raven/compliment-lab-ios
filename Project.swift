@@ -31,8 +31,8 @@ let project = Project(
             infoPlist: .extendingDefault(
                 with: [
                     "UILaunchScreen": [
-                        "UIColorName": "pink3",
-                        "UIImageName": "splash",
+                        "UIColorName": "",
+                        "UIImageName": "",
                     ],
                     "UIBackgroundModes": ["remote-notification"],
                     "UIAppFonts": [
@@ -44,8 +44,11 @@ let project = Project(
                         "SUITE-Regular.otf",
                         "SUITE-SemiBold.otf",
                     ],
+                    "UIUserInterfaceStyle": "Light",
+                    "CFBundleShortVersionString": "$(MARKETING_VERSION)",
+                    "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
                     "CFBundleDisplayName": "칭찬연구소",
-                    "BaseURL": "$(BASE_URL)"
+                    "BaseURL": "$(BASE_URL)",
                 ]
             ),
             sources: ["ComplimentLab/Sources/**"],
@@ -55,8 +58,15 @@ let project = Project(
                 .external(name: "RxSwift"),
                 .external(name: "RxCocoa"),
                 .external(name: "RxRelay"),
-                .external(name: "FirebaseMessaging")
-            ]
+                .external(name: "FirebaseMessaging"),
+                .external(name: "Lottie")
+            ],
+            settings: .settings(
+                base: [
+                    "MARKETING_VERSION": "1.0.1",
+                    "CURRENT_PROJECT_VERSION": "1"
+                ]
+            )
         ),
         .target(
             name: "ComplimentLabTests",

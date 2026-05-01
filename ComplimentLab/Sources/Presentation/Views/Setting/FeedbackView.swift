@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct FeedbackView: View {
+    @StateObject private var toastManager = ToastManager()
     @State private var feedbackText: String = ""
     @State private var placeholder = "함께 만드는 칭찬연구소.\n의견은 50자 이내로 적어주세요."
     @Environment(\.dismiss) var dismiss
@@ -42,6 +43,7 @@ struct FeedbackView: View {
                     .onChange(of: feedbackText) { _, newValue in
                         if newValue.count > 50 {
                             feedbackText = String(newValue.prefix(50))
+                            toastManager.show(message: "50글자까지만 제보가 가능해요")
                         }
                     }
             }
@@ -77,6 +79,7 @@ struct FeedbackView: View {
         .onTapGesture {
             UIApplication.shared.endEditing(true)
         }
+        .toast(manager: toastManager)
     }
 }
 

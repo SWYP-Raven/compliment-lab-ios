@@ -2,7 +2,7 @@
 //  FriendType.swift
 //  ComplimentLab
 //
-//  Created by wayblemac02 on 9/15/25.
+//  Created by 이인호 on 9/15/25.
 //
 
 import Foundation
@@ -210,6 +210,21 @@ enum FriendType: String, CaseIterable, Codable {
         }
     }
     
+    var cardShare: Image {
+        switch self {
+        case .kind:
+            return Image("Card share Pink")
+        case .energetic:
+            return Image("Card share Yellow")
+        case .studious:
+            return Image("Card share Violet")
+        case .special:
+            return Image("Card share Green")
+        case .quiet:
+            return Image("Card share Blue")
+        }
+    }
+    
     var chatIntroduceImage: Image {
         switch self {
         case .kind:
@@ -252,6 +267,21 @@ enum FriendType: String, CaseIterable, Codable {
             return Image("flower Green")
         case .quiet:
             return Image("flower blue")
+        }
+    }
+    
+    var lottieAnimation: String {
+        switch self {
+        case .kind:
+            "dot loading pink"
+        case .energetic:
+            "dot loading yellow"
+        case .studious:
+            "dot loading violet"
+        case .special:
+            "dot loading green"
+        case .quiet:
+            "dot loading blue"
         }
     }
 }

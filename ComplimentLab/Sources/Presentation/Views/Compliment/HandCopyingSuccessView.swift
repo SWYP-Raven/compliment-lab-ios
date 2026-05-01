@@ -37,7 +37,6 @@ struct HandCopyingSuccessView: View {
                         
                         Button {
                             let changedArchived = !dailyCompliment.isArchived
-                            complimentViewModel.toggleArchive()
                             complimentViewModel.patchCompliment(
                                 isArchived: changedArchived,
                                 isRead: dailyCompliment.isRead,

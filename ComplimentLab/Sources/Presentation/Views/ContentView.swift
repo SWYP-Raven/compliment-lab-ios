@@ -8,11 +8,21 @@ public struct ContentView: View {
 
     public var body: some View {
         if isActive {
-            if loginViewModel.hasToken {
-                CustomTabView()
-            } else {
-                LoginView(loginViewModel: loginViewModel)
+            ZStack {
+                if loginViewModel.hasToken {
+                    CustomTabView()
+                        .onAppear {
+                            loginViewModel.markOnboardingSeenIfNeeded()
+                        }
+                } else {
+                    if loginViewModel.hasSeenOnboarding {
+                        WelcomeBackView()
+                    } else {
+                        LoginView()
+                    }
+                }
             }
+            .animation(.easeInOut(duration: 0.3), value: loginViewModel.hasToken)
         } else {
             PinkGradientSplashView(isActive: $isActive)
         }
@@ -60,7 +70,7 @@ struct PinkGradientSplashView: View {
             logoOpacity = 1.0
         }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             withAnimation(.easeOut(duration: 0.5)) {
                 isActive = true
             }

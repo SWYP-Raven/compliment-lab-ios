@@ -37,4 +37,5 @@ struct Chat: Identifiable, Codable, Hashable {
 enum ChatRole: String, Codable {
     case ASSISTANT = "ASSISTANT"
     case USER = "USER"
+    case LOADING = "LOADING"
 }

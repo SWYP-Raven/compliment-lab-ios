@@ -10,7 +10,6 @@ import SwiftUI
 struct ChatingView: View {
     @StateObject var chatingViewModel = ChatingViewModel(useCase: ChatAPI())
     @State var message: String = ""
-//    @State var makeCard: Bool = false
     @Environment(\.dismiss) var dismiss
     let friend: Friend
     
@@ -126,148 +125,74 @@ struct ChatingView: View {
                     overlay: true
                 )
                 
-                CardAlertView(chatingViewModel: chatingViewModel)
+                if chatingViewModel.showCardAlert {
+                    Color.backgroundGray
+                        .edgesIgnoringSafeArea(.all)
+                        
+                    CardAlertView(chatingViewModel: chatingViewModel)
+                        .transition(.scale.combined(with: .opacity))
+                }
             }
+            .animation(.easeInOut(duration: 0.2), value: chatingViewModel.showCardAlert)
         } else {
             CardView(chatingViewModel: chatingViewModel, card: chatingViewModel.card)
         }
     }
 }
 
-struct ChatMessageRow: View {
-    @ObservedObject var chatingViewModel: ChatingViewModel
-    let chat: Chat
-    let friendType: FriendType
-    let isLast: Bool
-    
-    var body: some View {
-        HStack {
-            if chat.role == .USER {
-                Spacer()
-                Spacer()
-                Spacer()
-                Spacer()
-                Spacer()
-            }
-            
-            if chat.role == .ASSISTANT {
-                HStack(alignment: .top) {
-                    friendType.emoji
-                        .resizable()
-                        .frame(width: 35, height: 35)
-                    
-                    Text(chat.message)
-                        .padding()
-                        .font(.suite(.medium, size: 14))
-                        .background(Color.gray1)
-                        .clipShape(
-                            UnevenRoundedRectangle(
-                                topLeadingRadius: 0,
-                                bottomLeadingRadius: 15,
-                                bottomTrailingRadius: 15,
-                                topTrailingRadius: 15
-                            )
-                        )
-                    
-                    if isLast {
-                        VStack {
-                            Spacer()
-                            Button {
-                                chatingViewModel.showCardAlert = true
-                                chatingViewModel.createCardDTO = CreateCardDTO(chatId: chat.id, message: chat.message, role: chat.role)
-                            } label: {
-                                friendType.cardMake
-                            }
-                        }
-                    }
-                }
-                
-            } else {
-                Text(chat.message)
-                    .padding()
-                    .font(.suite(.medium, size: 14))
-                    .background(friendType.color2)
-                    .clipShape(
-                        UnevenRoundedRectangle(
-                          topLeadingRadius: 15,
-                          bottomLeadingRadius: 15,
-                          bottomTrailingRadius: 15,
-                          topTrailingRadius: 0
-                        )
-                    )
-            }
-            
-            if chat.role == .ASSISTANT {
-                Spacer()
-                Spacer()
-                Spacer()
-                Spacer()
-                Spacer()
-            }
-        }
-        .padding(.horizontal, 20)
-        .padding(.top)
-    }
-}
-
-
 struct CardAlertView: View {
     @ObservedObject var chatingViewModel: ChatingViewModel
+    
     var body: some View {
-        if chatingViewModel.showCardAlert {
-            Color.backgroundGray
-                .edgesIgnoringSafeArea(.all)
-                .onTapGesture {
-                    chatingViewModel.showCardAlert = false
-                }
+        VStack(spacing: 22) {
+            Image("kind")
             
-            VStack(spacing: 22) {
-                Image("kind")
+            Text("이 문장으로 칭찬카드를 만들까요?")
+                .font(.suite(.bold, size: 17))
+                .foregroundStyle(Color.gray8)
+            
+            Text("카드로 만들면 언제든 꺼내볼 수 있어요")
+                .font(.suite(.medium, size: 14))
+                .foregroundStyle(Color.gray6)
+            
+            HStack {
+                Button(action: {
+                    chatingViewModel.showCardAlert = false
+                }) {
+                    Text("취소")
+                        .font(.suite(.semiBold, size: 15))
+                        .foregroundStyle(Color.gray8)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray2)
+                        .cornerRadius(14)
+                }
                 
-                Text("이 문장으로 칭찬카드를 만들까요?")
-                    .font(.suite(.bold, size: 17))
-                    .foregroundStyle(Color.gray8)
-                
-                Text("카드로 만들면 언제든 꺼내볼 수 있어요")
-                    .font(.suite(.medium, size: 14))
-                    .foregroundStyle(Color.gray6)
-                
-                HStack {
-                    Button(action: {
-                        chatingViewModel.showCardAlert = false
-                    }) {
-                        Text("취소")
-                            .font(.suite(.semiBold, size: 15))
-                            .foregroundStyle(Color.gray8)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.gray2)
-                            .cornerRadius(14)
-                    }
+                Button(action: {
+                    chatingViewModel.showCardAlert = false
                     
-                    Button(action: {
-                        chatingViewModel.showCardAlert = false
+                    withAnimation {
                         chatingViewModel.makeCard = true
-                        chatingViewModel.postCard(createCardDTO: chatingViewModel.createCardDTO)
-                    }) {
-                        Text("좋아요")
-                            .font(.suite(.semiBold, size: 15))
-                            .foregroundStyle(Color.gray0)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.blue4)
-                            .foregroundColor(.white)
-                            .cornerRadius(14)
                     }
+                    chatingViewModel.postCard(createCardDTO: chatingViewModel.createCardDTO)
+                }) {
+                    Text("좋아요")
+                        .font(.suite(.semiBold, size: 15))
+                        .foregroundStyle(Color.gray0)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue4)
+                        .foregroundColor(.white)
+                        .cornerRadius(14)
                 }
             }
-            .padding(.vertical, 25)
-            .padding(.horizontal, 17)
-            .background(Color.gray0)
-            .cornerRadius(15)
-            .shadow(radius: 15)
-            .padding(.horizontal, 20)
         }
+        .padding(.vertical, 25)
+        .padding(.horizontal, 17)
+        .background(Color.gray0)
+        .cornerRadius(15)
+        .shadow(radius: 15)
+        .padding(.horizontal, 20)
     }
 }
 
