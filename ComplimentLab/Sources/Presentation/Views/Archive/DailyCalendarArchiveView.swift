@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Lottie
 
 struct DailyCalendarArchiveView: View {
     @ObservedObject var archiveViewModel: ArchiveViewModel
@@ -13,7 +14,15 @@ struct DailyCalendarArchiveView: View {
     @ObservedObject var complimentViewModel: ComplimentViewModel
     
     var body: some View {
-        if archiveViewModel.archivedCompliments.isEmpty {
+        if archiveViewModel.isLoading {
+            VStack {
+                Spacer()
+                LottieView(animation: .named("dot loading pink"))
+                    .playing(loopMode: .loop)
+                    .frame(width: 80, height: 80)
+                Spacer()
+            }
+        } else if archiveViewModel.archivedCompliments.isEmpty {
             VStack {
                 Spacer()
                 Image("daily X")
@@ -43,12 +52,17 @@ struct DailyCalendarArchiveView: View {
                                     
                                     Button {
                                         let changedArchived = !dailyCompliment.isArchived
-                                        
-                                        if let index = archiveViewModel.archivedCompliments.firstIndex(where: { calendarViewModel.isSameDay(date1: $0.date, date2: dailyCompliment.date )}) {
-                                            archiveViewModel.archivedCompliments[index].isArchived.toggle()
+                                        if changedArchived {
+                                            if let index = archiveViewModel.archivedCompliments.firstIndex(where: { calendarViewModel.isSameDay(date1: $0.date, date2: dailyCompliment.date) }) {
+                                                archiveViewModel.archivedCompliments[index].isArchived = true
+                                            }
+                                        } else {
+                                            archiveViewModel.archivedCompliments.removeAll {
+                                                calendarViewModel.isSameDay(date1: $0.date, date2: dailyCompliment.date)
+                                            }
                                         }
-                                        
                                         complimentViewModel.patchCompliment(isArchived: changedArchived, isRead: dailyCompliment.isRead, date: dailyCompliment.date)
+                                        archiveViewModel.patchArchived(changedArchived, isRead: dailyCompliment.isRead, date: dailyCompliment.date)
                                     } label: {
                                         ZStack {
                                             Image("Flower Default Default")

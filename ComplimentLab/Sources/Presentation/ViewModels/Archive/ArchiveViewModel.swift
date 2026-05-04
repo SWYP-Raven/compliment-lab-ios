@@ -17,28 +17,52 @@ final class ArchiveViewModel: ObservableObject {
     @Published var archivedCompliments: [DailyCompliment] = []
     @Published var archivedCards: [Card] = []
     @Published var sortType: SortType = .recent
-    
-    let useCase: ComplimentUseCase
+    @Published var isLoading = false
+
     let chatUseCase: ChatUseCase
     let disposeBag = DisposeBag()
-    
-    init(useCase: ComplimentUseCase, chatUseCase: ChatUseCase) {
-        self.useCase = useCase
+
+    private var userUID: String = ""
+    private var recordRepository: ComplimentRecordRepository?
+
+    private let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f
+    }()
+
+    init(chatUseCase: ChatUseCase) {
         self.chatUseCase = chatUseCase
     }
-    
+
+    func configure(userId: String) {
+        self.userUID = userId
+        self.recordRepository = ComplimentRecordRepository(userId: userId)
+    }
+
     func getArchivedCompliments(year: Int, month: Int) {
-        let date = "\(year)-\(String(format: "%02d", month))"
-        guard let accessToken = KeychainStorage.shared.getToken()?.accessToken else {
-            return
+        guard let repo = recordRepository else { return }
+        isLoading = true
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            await repo.fetchAllRecords()
+            let records = repo.archivedRecords()
+            let items = records.compactMap { record -> DailyCompliment? in
+                guard let date = self.dateFormatter.date(from: record.date) else { return nil }
+                let comps = Calendar.current.dateComponents([.year, .month], from: date)
+                guard comps.year == year, comps.month == month else { return nil }
+                let compliment = ComplimentLocalDataSource.compliment(for: date, userUID: self.userUID)
+                return DailyCompliment(compliment: compliment, date: date, isArchived: true, isRead: record.isRead)
+            }
+            self.archivedCompliments = self.sortCompliments(items, by: self.sortType)
+            self.isLoading = false
         }
-        
-        useCase.archivedCompliment(date: date, token: accessToken)
-            .subscribe(onNext: { [weak self] items in
-                guard let self else { return }
-                self.archivedCompliments = self.sortCompliments(items, by: self.sortType)
-            })
-            .disposed(by: disposeBag)
+    }
+
+    func patchArchived(_ isArchived: Bool, isRead: Bool, date: Date) {
+        let key = ComplimentLocalDataSource.dateKey(for: date)
+        recordRepository?.setArchived(isArchived, for: key)
+        recordRepository?.setRead(isRead, for: key)
     }
     
     func getArchivedCards(year: Int, month: Int) {

@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct CustomTabView: View {
     @StateObject var calendarViewModel = CalendarViewModel()
-    @StateObject var complimentViewModel = ComplimentViewModel(useCase: ComplimentAPI())
-    @StateObject var archiveViewModel = ArchiveViewModel(useCase: ComplimentAPI(), chatUseCase: ChatAPI())
+    @StateObject var complimentViewModel = ComplimentViewModel()
+    @StateObject var archiveViewModel = ArchiveViewModel(chatUseCase: ChatAPI())
     @StateObject var friendViewModel = FriendViewModel(useCase: FriendAPI())
     @State private var selection = 0
     @State private var showCreateFriends = false
@@ -84,6 +85,11 @@ struct CustomTabView: View {
             .navigationDestination(isPresented: $calendarViewModel.isButtonTapped) {
                 TodayComplimentView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel)
             }
+        }
+        .task {
+            guard let userId = Auth.auth().currentUser?.uid else { return }
+            complimentViewModel.configure(userId: userId)
+            archiveViewModel.configure(userId: userId)
         }
     }
 }

@@ -41,7 +41,14 @@ struct DailyCompliment: Codable, Hashable {
     let date: Date
     var isArchived: Bool
     var isRead: Bool
-    
+
+    init(compliment: Compliment, date: Date, isArchived: Bool, isRead: Bool) {
+        self.compliment = compliment
+        self.date = date
+        self.isArchived = isArchived
+        self.isRead = isRead
+    }
+
     enum CodingKeys: String, CodingKey {
         case compliment, date
         case isArchived = "is_archived"
