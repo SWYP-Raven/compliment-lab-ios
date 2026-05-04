@@ -10,6 +10,7 @@ import SwiftUI
 struct HandCopyingView: View {
     @ObservedObject var complimentViewModel: ComplimentViewModel
     @StateObject private var toastManager = ToastManager()
+    @StateObject private var adManager = InterstitialAdManager()
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -59,13 +60,19 @@ struct HandCopyingView: View {
             if complimentViewModel.copyingSuccess {
                 Color.backgroundGray
                     .edgesIgnoringSafeArea(.all)
-                
+
                 VStack {
-                    HandCopyingSuccessView(complimentViewModel: complimentViewModel)
+                    HandCopyingSuccessView(complimentViewModel: complimentViewModel) {
+                        adManager.showAd {
+                            complimentViewModel.copyingSuccess = false
+                            dismiss()
+                        }
+                    }
                 }
                 .transition(.scale.combined(with: .opacity))
             }
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: complimentViewModel.copyingSuccess)
+        .onAppear { adManager.loadAd() }
     }
 }

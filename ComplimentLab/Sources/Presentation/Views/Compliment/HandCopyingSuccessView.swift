@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HandCopyingSuccessView: View {
     @ObservedObject var complimentViewModel: ComplimentViewModel
-    @Environment(\.dismiss) var dismiss
+    let onDismiss: () -> Void
     
     var body: some View {
         VStack {
@@ -85,8 +85,7 @@ struct HandCopyingSuccessView: View {
                 
                 // 홈으로 돌아가기
                 Button {
-                    complimentViewModel.copyingSuccess = false
-                    dismiss()
+                    onDismiss()
                 } label: {
                     Image("X Background Default")
                 }
