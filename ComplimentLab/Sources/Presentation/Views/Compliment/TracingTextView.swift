@@ -72,6 +72,7 @@ struct TracingTextView: View {
         if fullInput.count == sentence.count {
             if fullInput == sentence {
                 viewModel.copyingSuccess = true
+                viewModel.patchCompliment(isArchived: viewModel.dailyCompliment?.isArchived ?? false, isRead: true, date: viewModel.dailyCompliment?.date ?? Date())
                 return true
             } else {
                 toastManager.show(message: "조금 다르네요, 다시 해볼까요?")
@@ -143,5 +144,5 @@ struct TracingTextView: View {
 }
 
 #Preview {
-    TracingTextView(viewModel: ComplimentViewModel(useCase: ComplimentAPI()), toastManager: ToastManager(), sentence: "")
+    TracingTextView(viewModel: ComplimentViewModel(), toastManager: ToastManager(), sentence: "")
 }

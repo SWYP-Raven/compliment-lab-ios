@@ -120,8 +120,6 @@ struct TodayComplimentView: View {
                     
                     if isToday && !dailyCompliment.isRead {
                         toastManager.show(message: "글자를 눌러 직접 입력해 보세요")
-                        
-                        complimentViewModel.patchCompliment(isArchived: dailyCompliment.isArchived, isRead: true, date: calendarViewModel.selectDate)
                     }
                 }
                 .customNavigationBar(
