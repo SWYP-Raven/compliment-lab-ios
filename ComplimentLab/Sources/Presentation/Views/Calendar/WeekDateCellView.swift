@@ -12,7 +12,7 @@ struct WeekDateCellView: View {
     @ObservedObject var calendarViewModel: CalendarViewModel
     @ObservedObject var complimentViewModel: ComplimentViewModel
     var calendarDate: CalendarDate
-    let compliment: DailyCompliment?
+    let compliment: DailyCompliment
     
     private var dateState: DateState {
         calendarViewModel.state(for: calendarDate.date, in: calendarViewModel.week)
@@ -63,62 +63,53 @@ struct WeekDateCellView: View {
             Button {
                 if dateState == .future || (dateState == .outsideMonth && calendarDate.date > Date()) {
                     toastManager.show(message: "쉿, 미래의 하루는 아직 비밀이에요")
-                } else if dateState == .today && compliment?.isRead == false { // && 아직 확인 안한상태면
-                    complimentViewModel.dailyCompliment = compliment
+                } else if dateState == .today && compliment.isRead == false {
+                    complimentViewModel.dailyCompliment = complimentViewModel.resolvedCompliment(for: calendarDate.date)
                     calendarViewModel.isButtonTapped = true
                     calendarViewModel.selectDate = calendarDate.date
                 } else {
                     if isSameDay {
-                        complimentViewModel.dailyCompliment = compliment
+                        complimentViewModel.dailyCompliment = complimentViewModel.resolvedCompliment(for: calendarDate.date)
                         calendarViewModel.isButtonTapped = true
                     } else {
-                        let compliment = complimentViewModel.complimentList.first { calendarViewModel.isSameDay(date1: $0.date, date2: calendarDate.date )}
-                        
-//                        guard let compliment = DailyCompliment.mockComplimentsMap[calendarDate.date] else { return }
-                        complimentViewModel.dailyCompliment = compliment
+                        complimentViewModel.dailyCompliment = complimentViewModel.resolvedCompliment(for: calendarDate.date)
                         calendarViewModel.selectDate = calendarDate.date
                     }
                 }
             } label: {
                 switch dateState {
                 case .past:
-                    if let compliment = compliment {
+                    if compliment.isRead {
+                        Circle()
+                            .fill(compliment.compliment.type.color2)
+                            .overlay(compliment.compliment.type.stickerSImage)
+                    } else {
+                        Circle().fill(Color.gray3)
+                    }
+                case .today:
+                    if compliment.isRead {
+                        Circle()
+                            .fill(compliment.compliment.type.color2)
+                            .overlay(compliment.compliment.type.stickerSImage)
+                    } else {
+                        Circle()
+                            .fill(Color.blue1)
+                            .overlay(
+                                Image("Plus Default")
+                                    .renderingMode(.template)
+                                    .foregroundColor(Color.blue4)
+                            )
+                    }
+                case .future:
+                    Circle().fill(Color.gray1)
+                case .outsideMonth:
+                    if calendarDate.date < Date() {
                         if compliment.isRead {
                             Circle()
                                 .fill(compliment.compliment.type.color2)
                                 .overlay(compliment.compliment.type.stickerSImage)
                         } else {
                             Circle().fill(Color.gray3)
-                        }
-                    }
-                case .today:
-                    if let compliment = compliment {
-                        if compliment.isRead {
-                            Circle()
-                                .fill(compliment.compliment.type.color2)
-                                .overlay(compliment.compliment.type.stickerSImage)
-                        } else {
-                            Circle()
-                                .fill(Color.blue1)
-                                .overlay(
-                                    Image("Plus Default")
-                                        .renderingMode(.template)
-                                        .foregroundColor(Color.blue4)
-                                )
-                        }
-                    }
-                case .future:
-                    Circle().fill(Color.gray1)
-                case .outsideMonth:
-                    if calendarDate.date < Date() {
-                        if let compliment = compliment {
-                            if compliment.isRead {
-                                Circle()
-                                    .fill(compliment.compliment.type.color2)
-                                    .overlay(compliment.compliment.type.stickerSImage)
-                            } else {
-                                Circle().fill(Color.gray3)
-                            }
                         }
                     } else if calendarDate.date > Date() {
                         Circle().fill(Color.gray1)

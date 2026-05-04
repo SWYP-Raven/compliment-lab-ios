@@ -12,7 +12,7 @@ struct MonthDateCellView: View {
     @ObservedObject var calendarViewModel: CalendarViewModel
     @ObservedObject var complimentViewModel: ComplimentViewModel
     var calendarDate: CalendarDate
-    let compliment: DailyCompliment?
+    let compliment: DailyCompliment
     
     private var dateState: DateState {
         calendarViewModel.state(for: calendarDate.date, in: calendarViewModel.month)
@@ -53,7 +53,7 @@ struct MonthDateCellView: View {
                         toastManager.show(message: "쉿, 미래의 하루는 아직 비밀이에요")
                     } else {
                         calendarViewModel.selectDate = calendarDate.date
-                        complimentViewModel.dailyCompliment = compliment
+                        complimentViewModel.dailyCompliment = complimentViewModel.resolvedCompliment(for: calendarDate.date)
                         calendarViewModel.isButtonTapped = true
                     }
                 } else {
@@ -66,30 +66,26 @@ struct MonthDateCellView: View {
             } label: {
                 switch dateState {
                 case .past:
-                    if let compliment = compliment {
-                        if compliment.isRead {
-                            Circle()
-                                .fill(compliment.compliment.type.color2)
-                                .overlay(compliment.compliment.type.stickerSImage)
-                        } else {
-                            Circle().fill(Color.gray3)
-                        }
+                    if compliment.isRead {
+                        Circle()
+                            .fill(compliment.compliment.type.color2)
+                            .overlay(compliment.compliment.type.stickerSImage)
+                    } else {
+                        Circle().fill(Color.gray3)
                     }
                 case .today:
-                    if let compliment = compliment {
-                        if compliment.isRead {
-                            Circle()
-                                .fill(compliment.compliment.type.color2)
-                                .overlay(compliment.compliment.type.stickerSImage)
-                        } else {
-                            Circle()
-                                .fill(Color.blue1)
-                                .overlay(
-                                    Image("Plus Default")
-                                        .renderingMode(.template)
-                                        .foregroundColor(Color.blue4)
-                                )
-                        }
+                    if compliment.isRead {
+                        Circle()
+                            .fill(compliment.compliment.type.color2)
+                            .overlay(compliment.compliment.type.stickerSImage)
+                    } else {
+                        Circle()
+                            .fill(Color.blue1)
+                            .overlay(
+                                Image("Plus Default")
+                                    .renderingMode(.template)
+                                    .foregroundColor(Color.blue4)
+                            )
                     }
                 case .future:
                     Circle().fill(Color.gray1)

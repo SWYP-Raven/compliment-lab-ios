@@ -19,7 +19,7 @@ struct CalendarGridView: View {
             if calendarViewModel.mode == .month {
                 LazyVGrid(columns: Array(repeating: GridItem(), count: 7)) {
                     ForEach(dates) { value in
-                        let compliment = complimentViewModel.complimentList.first { calendarViewModel.isSameDay(date1: $0.date, date2: value.date )}
+                        let compliment = complimentViewModel.resolvedCompliment(for: value.date)
                         
                         MonthDateCellView(toastManager: toastManager, calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, calendarDate: value, compliment: compliment)
                     }
@@ -27,7 +27,7 @@ struct CalendarGridView: View {
             } else {
                 LazyVGrid(columns: Array(repeating: GridItem(), count: 7)) {
                     ForEach(dates) { value in
-                        let compliment = complimentViewModel.complimentList.first { calendarViewModel.isSameDay(date1: $0.date, date2: value.date )}
+                        let compliment = complimentViewModel.resolvedCompliment(for: value.date)
                             
                         WeekDateCellView(toastManager: toastManager, calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel, calendarDate: value, compliment: compliment)
                     }
