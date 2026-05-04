@@ -14,7 +14,7 @@ final class InterstitialAdManager: NSObject, ObservableObject {
 
     func loadAd() {
         GADInterstitialAd.load(
-            withAdUnitID: "ca-app-pub-3940256099942544/4411468910", // "ca-app-pub-8889421922972515/8929360180"
+            withAdUnitID: "ca-app-pub-8889421922972515/8929360180", // 테스트: "ca-app-pub-3940256099942544/4411468910"
             request: GADRequest()
         ) { [weak self] ad, error in
             guard let self else { return }

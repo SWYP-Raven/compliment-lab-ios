@@ -21,11 +21,12 @@ struct CalendarView: View {
             VStack(alignment: .leading) {
                 CalendarHeaderView(calendarViewModel: calendarViewModel, complimentViewModel: complimentViewModel)
                     .padding(.bottom, 15)
-                NavigateToFriendView()
+                BannerAdView()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: BannerAdView.height)
+                    .padding(5)
+                    .background(Color.blue1.clipShape(RoundedRectangle(cornerRadius: 12)))
                     .padding(.bottom, 18)
-                    .onTapGesture {
-                        selection = 1
-                    }
                 WeekdayHeaderView()
                 
                 if calendarViewModel.mode == .month {

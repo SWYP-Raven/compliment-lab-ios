@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import GoogleMobileAds
 
 struct CalendarHeaderView: View {
     @ObservedObject var calendarViewModel: CalendarViewModel
@@ -43,33 +44,34 @@ struct CalendarHeaderView: View {
     }
 }
 
-struct NavigateToFriendView: View {
-    @EnvironmentObject var loginViewModel: LoginViewModel
-    
-    var body: some View {
-        HStack {
-            Image("Character Pink half")
-            
-            VStack(alignment: .leading) {
-                Text("\(loginViewModel.username)님,")
-                    .font(.suite(.bold, size: 17))
-                    .foregroundColor(Color.blue4)
-                
-                Text("나만의 칭구를 만나보세요!")
-                    .font(.suite(.medium, size: 14))
-                    .foregroundColor(Color.gray5)
-            }
-            .padding(.leading, 23)
-            
-            Spacer()
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.leading, 22)
-        .padding(.trailing, 15)
-        .padding(.top, 10)
-        .background(Color.blue1)
-        .clipShape(RoundedRectangle(cornerRadius: 15))
+struct BannerAdView: UIViewRepresentable {
+    private let adUnitID = "ca-app-pub-8889421922972515/2380263700"
+//    private let adUnitID = "ca-app-pub-3940256099942544/2934735716" // 테스트
+
+    private static var adSize: GADAdSize {
+        UIScreen.main.bounds.width <= 375 ? GADAdSizeBanner : GADAdSizeLargeBanner
     }
+
+    static var height: CGFloat {
+        adSize.size.height
+    }
+
+    func makeUIView(context: Context) -> GADBannerView {
+        let bannerView = GADBannerView()
+        bannerView.adUnitID = adUnitID
+        bannerView.backgroundColor = .clear
+        bannerView.adSize = BannerAdView.adSize
+
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first?.rootViewController
+        else { return bannerView }
+
+        bannerView.rootViewController = rootVC
+        bannerView.load(GADRequest())
+        return bannerView
+    }
+
+    func updateUIView(_ uiView: GADBannerView, context: Context) {}
 }
 
 struct WeekdayHeaderView: View {
