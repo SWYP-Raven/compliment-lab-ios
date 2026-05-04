@@ -12,33 +12,17 @@ struct LoginView: View {
     @EnvironmentObject var loginViewModel: LoginViewModel
     @State private var currentPage = 0
     @State private var appleLoginCoordinator = AppleLoginManager()
-    @State private var showAgreeView: Bool = false
     private let totalPages = 3
     private var isLogin: Bool { currentPage == 2 }
-    
+
     var body: some View {
         NavigationStack {
             ZStack {
                 onboardingContent
-
-                if showAgreeView {
-                    AgreeModalView(isPresented: $showAgreeView) {
-                        AgreementView(onAgreementCompleted: {
-                            loginViewModel.naviToProfileEdit = true
-                        })
-                    }
-                }
             }
-            .onReceive(appleLoginCoordinator.$token) { token in
-                guard let token else { return }
-                loginViewModel.loginWithApple(identityToken: token)
-            }
-            .onReceive(loginViewModel.$isSignup) { isSignup in
-                guard let isSignup else { return }
-                
-                if !isSignup {
-                    loginViewModel.naviToProfileEdit = true
-                }
+            .onReceive(appleLoginCoordinator.$credential) { credential in
+                guard let credential else { return }
+                loginViewModel.loginWithApple(credential: credential)
             }
             .navigationDestination(isPresented: $loginViewModel.naviToProfileEdit) {
                 ProfileSetupView()
@@ -46,7 +30,7 @@ struct LoginView: View {
         }
         .toolbarVisibility(.hidden, for: .navigationBar)
     }
-    
+
     private var onboardingContent: some View {
         VStack {
             HStack(spacing: 10) {
@@ -64,9 +48,9 @@ struct LoginView: View {
                 }
             }
             .padding(.bottom, 68)
-            
+
             Spacer()
-            
+
             TabView(selection: $currentPage) {
                 OnboardingPageView(
                     title: "칭찬을 보아요",
@@ -74,14 +58,14 @@ struct LoginView: View {
                     imageName: "Onboarding1"
                 )
                 .tag(0)
-                
+
                 OnboardingPageView(
                     title: "칭찬을 들어요",
                     subtitle: "칭찬 친구, 칭구를 만나서\n대화할 수 있어요",
                     imageName: "Onboarding2"
                 )
                 .tag(1)
-                
+
                 OnboardingPageView(
                     title: "칭찬을 모으고 꺼내요",
                     subtitle: "마음에 드는 칭찬은\n저장과 공유가 가능해요",
@@ -91,45 +75,89 @@ struct LoginView: View {
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             .padding(.bottom, 117)
-            
+
             Spacer()
-            
-            Button(action: {
-                if isLogin {
-                    performAppleLogin()
-                } else {
-                    withAnimation {
-                        currentPage += 1
-                    }
-                }
-            }) {
+
+            if isLogin {
+                loginButtons
+            } else {
+                nextButton
+            }
+        }
+        .background(Color.white)
+    }
+
+    private var loginButtons: some View {
+        VStack(spacing: 12) {
+            // Apple 로그인
+            Button(action: performAppleLogin) {
                 Label {
-                    Text(isLogin ? "Apple로 시작하기" : "다음")
+                    Text("Apple로 시작하기")
                         .foregroundColor(.white)
                         .font(.suite(.semiBold, size: 17))
                 } icon: {
-                    if isLogin {
-                        Image(systemName: "apple.logo")
-                            .foregroundColor(.white)
-                    }
+                    Image(systemName: "apple.logo")
+                        .foregroundColor(.white)
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(isLogin ? Color.black : Color.blue3)
+                .background(Color.black)
                 .cornerRadius(12)
                 .padding(.horizontal, 20)
             }
             .buttonStyle(PlainButtonStyle())
             .padding(.bottom, 15.72)
+//
+//            // Google 로그인
+//            Button(action: {
+//                loginViewModel.loginWithGoogle()
+//            }) {
+//                HStack(spacing: 8) {
+//                    Image("google_logo") // Assets에 구글 로고 이미지 추가 필요
+//                        .resizable()
+//                        .scaledToFit()
+//                        .frame(width: 20, height: 20)
+//                    Text("Google로 시작하기")
+//                        .foregroundColor(.gray)
+//                        .font(.suite(.semiBold, size: 17))
+//                }
+//                .frame(maxWidth: .infinity)
+//                .padding()
+//                .background(Color.white)
+//                .cornerRadius(12)
+//                .overlay(
+//                    RoundedRectangle(cornerRadius: 12)
+//                        .stroke(Color.gray3, lineWidth: 1)
+//                )
+//                .padding(.horizontal, 20)
+//            }
+//            .buttonStyle(PlainButtonStyle())
         }
-        .background(Color.white)
     }
-    
-    
+
+    private var nextButton: some View {
+        Button(action: {
+            withAnimation { currentPage += 1 }
+        }) {
+            Text("다음")
+                .foregroundColor(.white)
+                .font(.suite(.semiBold, size: 17))
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.blue3)
+                .cornerRadius(12)
+                .padding(.horizontal, 20)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .padding(.bottom, 15.72)
+    }
+
     private func performAppleLogin() {
+        let hashedNonce = appleLoginCoordinator.prepareNonce()
         let request = ASAuthorizationAppleIDProvider().createRequest()
         request.requestedScopes = [.fullName, .email]
-        
+        request.nonce = hashedNonce
+
         let controller = ASAuthorizationController(authorizationRequests: [request])
         controller.delegate = appleLoginCoordinator
         controller.presentationContextProvider = appleLoginCoordinator
@@ -141,17 +169,16 @@ struct OnboardingPageView: View {
     let title: String
     let subtitle: String
     let imageName: String
-    
+
     var body: some View {
         VStack() {
             Spacer()
-        
+
             Text(title)
                 .font(.suite(.semiBold, size: 24))
                 .foregroundColor(Color.pink3)
-                .foregroundColor(.pink)
                 .padding(.bottom, 20)
-            
+
             Text(subtitle)
                 .font(.suite(.semiBold, size: 14))
                 .foregroundColor(Color.gray6)
@@ -160,16 +187,13 @@ struct OnboardingPageView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 20)
                 .padding(.bottom, 95)
-            
+
             Image(imageName)
                 .resizable()
                 .scaledToFit()
                 .frame(height: 257.28)
-            
+
             Spacer()
         }
     }
 }
-
-
-

@@ -6,13 +6,16 @@
 //
 
 import SwiftUI
+import AuthenticationServices
 
 struct AccountManagementView: View {
     @EnvironmentObject var loginViewModel: LoginViewModel
     @Environment(\.dismiss) var dismiss
     @State var showAlert: Bool = false
     @State var alertType: AlertType = .logout
-    
+    @State private var appleLoginCoordinator = AppleLoginManager()
+    @State private var pendingWithdraw = false
+
     var body: some View {
         ZStack {
             VStack(alignment: .leading, spacing: 32) {
@@ -71,12 +74,36 @@ struct AccountManagementView: View {
             if showAlert {
                 Color.backgroundGray
                     .edgesIgnoringSafeArea(.all)
-                
-                CustomAlertView(showAlert: $showAlert, type: alertType)
-                    .transition(.scale(scale: 0.9).combined(with: .opacity))
-                    .zIndex(1)
+
+                CustomAlertView(showAlert: $showAlert, type: alertType) {
+                    if alertType == .logout {
+                        loginViewModel.logout()
+                    } else {
+                        pendingWithdraw = true
+                        performAppleReauth()
+                    }
+                }
+                .transition(.scale(scale: 0.9).combined(with: .opacity))
+                .zIndex(1)
             }
         }
+        .onReceive(appleLoginCoordinator.$credential) { credential in
+            guard let credential, pendingWithdraw else { return }
+            pendingWithdraw = false
+            loginViewModel.reauthAndDelete(credential: credential)
+        }
+    }
+
+    private func performAppleReauth() {
+        let hashedNonce = appleLoginCoordinator.prepareNonce()
+        let request = ASAuthorizationAppleIDProvider().createRequest()
+        request.requestedScopes = [.fullName, .email]
+        request.nonce = hashedNonce
+
+        let controller = ASAuthorizationController(authorizationRequests: [request])
+        controller.delegate = appleLoginCoordinator
+        controller.presentationContextProvider = appleLoginCoordinator
+        controller.performRequests()
     }
 }
 
@@ -107,9 +134,9 @@ enum AlertType {
 }
 
 struct CustomAlertView: View {
-    @EnvironmentObject var loginViewModel: LoginViewModel
     @Binding var showAlert: Bool
     let type: AlertType
+    let onConfirm: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
@@ -137,12 +164,8 @@ struct CustomAlertView: View {
                 }
                 
                 Button(action: {
-                    if type == .logout {
-                        loginViewModel.logout()
-                    } else {
-                        loginViewModel.deleteUser()
-                    }
                     showAlert = false
+                    onConfirm()
                 }) {
                     Text(type.confirmTitle)
                         .font(.suite(.semiBold, size: 15))

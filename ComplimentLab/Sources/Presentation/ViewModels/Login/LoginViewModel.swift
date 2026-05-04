@@ -1,207 +1,148 @@
 //
-//  LoginView.swift
+//  LoginViewModel.swift
 //  ComplimentLab
 //
 //  Created by CatSlave on 8/8/25.
 //
 
-
 import UIKit
-import RxSwift
+import FirebaseAuth
+import FirebaseCore
+import FirebaseFirestore
+import GoogleSignIn
 
 @MainActor
 final class LoginViewModel: ObservableObject {
     @Published var completed: Void?
-    @Published var isSignup: Bool?
     @Published var naviToProfileEdit = false
-    @Published var hasToken: Bool = KeychainStorage.shared.hasToken()
+    @Published var isLoggedIn: Bool = false
     @Published var hasSeenOnboarding: Bool = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
-    @Published var username: String = UserDefaults.standard.string(forKey: "username") ?? "" {
-        didSet {
-            UserDefaults.standard.set(username, forKey: "username")
-        }
-    }
-    
-    var pendingAccessToken: String?
-    var pendingRefreshToken: String?
+    @Published var username: String = ""
 
-    let useCase: LoginUseCase
-    let disposeBag = DisposeBag()
-    
-    init(useCase: LoginUseCase) {
-        self.useCase = useCase
-        self.fetchUserIfNeeded()
-    }
-    
-    func loginWithApple(identityToken: String) {
-        print(#function, #line, "Path : # ")
-        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BaseURL") as? String, let url = URL(string: "\(baseURL)/auth/apple") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let loginRequest = LoginRequest(identityToken: identityToken)
-        
-        do {
-            request.httpBody = try JSONEncoder().encode(loginRequest)
-        } catch {
-            return
-        }
-        
-        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            DispatchQueue.main.async {
-                guard error == nil,
-                      let data,
-                      let loginResponse = try? JSONDecoder().decode(LoginResponse.self, from: data),
-                      loginResponse.success else { return }
-                
-                self?.isSignup = loginResponse.data.isSignup
-                
-                if loginResponse.data.isSignup {
-                    self?.saveTokens(
-                        accessToken: loginResponse.data.accessToken,
-                        refreshToken: loginResponse.data.refreshToken
-                    )
-                    
-                    if loginResponse.data.isSignup {
-                        self?.useCase.getUser(token: loginResponse.data.accessToken)
-                            .subscribe(onNext: { user in
-                                self?.username = user.nickname
-                            })
-                            .disposed(by: self!.disposeBag)
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        self?.pendingAccessToken = loginResponse.data.accessToken
-                        self?.pendingRefreshToken = loginResponse.data.refreshToken
-                    }
-                }
-            }
-        }.resume()
-    }
-    
-    // MARK: - Token Management
-    private func saveTokens(accessToken: String, refreshToken: String) {
-        let token = Token(accessToken: accessToken, refreshToken: refreshToken)
-        let tokenData = try? JSONEncoder().encode(token)
-        KeychainStorage.shared.saveToken(tokenData)
-        hasToken = true
-    }
-    
-    func logout() {
-        KeychainStorage.shared.deleteToken()
-        hasToken = false
-    }
-    
-    func editUser(nickname: String) {
-        let editUserDTO = EditUserDTO(nickname: nickname, friendAlarm: true, archiveAlarm: true, marketingAlarm: true, eventAlarm: true)
-        
-        guard let accessToken = KeychainStorage.shared.getToken()?.accessToken else {
-            return
-        }
-        
-        useCase.editUser(editUserDTO: editUserDTO, token: accessToken)
-            .subscribe(
-                onNext: {
-                    self.username = nickname
-                    print("닉네임 변경 성공")
-                },
-                onError: { error in
-                    print("닉네임 변경 실패: \(error)")
-                }
-            )
-            .disposed(by: disposeBag)
-    }
-    
-    func deleteUser() {
-        guard let accessToken = KeychainStorage.shared.getToken()?.accessToken else {
-            return
-        }
-        
-        useCase.deleteUser(token: accessToken)
-            .subscribe(
-                onNext: {
-                    if let bundleID = Bundle.main.bundleIdentifier {
-                        UserDefaults.standard.removePersistentDomain(forName: bundleID)
-                        UserDefaults.standard.synchronize()
-                    }
-                    KeychainStorage.shared.deleteToken()
-                    self.hasToken = false
-                    self.hasSeenOnboarding = false
-                    print("유저 탈퇴 성공")
-                },
-                onError: { error in
-                    print("유저 탈퇴 실패: \(error)")
-                }
-            )
-            .disposed(by: disposeBag)
-    }
-    
-    func fetchUserIfNeeded() {
-        guard let accessToken = KeychainStorage.shared.getToken()?.accessToken else {
-            return
-        }
-        
-        if UserDefaults.standard.string(forKey: "username") == nil {
-            useCase.getUser(token: accessToken)
-                .subscribe(onNext: { [weak self] user in
-                    self?.username = user.nickname
-                })
-                .disposed(by: disposeBag)
-        }
-    }
-    
-    func requestSetProfile(name: String) {
-        print(#function, #line, "Path : # ")
-        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BaseURL") as? String, let url = URL(string: "\(baseURL)/user"),
-        let accessToken = pendingAccessToken else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        
-        let profileRequest = ProfileUpdateRequest(nickname: name)
-        
-        do {
-            request.httpBody = try JSONEncoder().encode(profileRequest)
-        } catch {
-            return
-        }
-        
-        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            DispatchQueue.main.async {
-                if let data = data {
-                    let dataString = String(data: data, encoding: .utf8) ?? "인코딩 실패"
-                }
-                
-                guard error == nil,
-                      let data,
-                      let response = try? JSONDecoder().decode(ProfileUpdateResponse.self, from: data),
-                      response.success else {
+    private var authStateListener: AuthStateDidChangeListenerHandle?
+
+    func setupAuthListener() {
+        authStateListener = Auth.auth().addStateDidChangeListener { [weak self] _, user in
+            Task { @MainActor in
+                guard let self else { return }
+                guard let user else {
+                    self.isLoggedIn = false
+                    self.username = ""
                     return
                 }
-                
-                if let access = self?.pendingAccessToken, let refresh = self?.pendingRefreshToken {
-                    self?.saveTokens(accessToken: access, refreshToken: refresh)
-                    self?.pendingAccessToken = nil
-                    self?.pendingRefreshToken = nil
+                let displayName = user.displayName ?? ""
+                if !displayName.isEmpty {
+                    self.username = displayName
+                    self.isLoggedIn = true
                 }
-                self?.username = response.data.nickname
+            }
+        }
+    }
+
+    // MARK: - Apple Login
+
+    func loginWithApple(credential: OAuthCredential) {
+        Auth.auth().signIn(with: credential) { [weak self] result, error in
+            guard let self, let user = result?.user, error == nil else { return }
+            self.handleSignedInUser(user)
+        }
+    }
+
+    // MARK: - Google Login
+
+    func loginWithGoogle() {
+        guard let clientID = FirebaseApp.app()?.options.clientID,
+              let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first?.rootViewController else { return }
+
+        let config = GIDConfiguration(clientID: clientID)
+        GIDSignIn.sharedInstance.configuration = config
+
+        GIDSignIn.sharedInstance.signIn(withPresenting: rootVC) { [weak self] result, error in
+            guard let self, let user = result?.user, error == nil,
+                  let idToken = user.idToken?.tokenString else { return }
+
+            let firebaseCredential = GoogleAuthProvider.credential(
+                withIDToken: idToken,
+                accessToken: user.accessToken.tokenString
+            )
+
+            Auth.auth().signIn(with: firebaseCredential) { [weak self] result, error in
+                guard let self, let firebaseUser = result?.user, error == nil else { return }
+                self.handleSignedInUser(firebaseUser)
+            }
+        }
+    }
+
+    // MARK: - Profile Setup
+
+    func requestSetProfile(name: String) {
+        let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
+        changeRequest?.displayName = name
+        changeRequest?.commitChanges { [weak self] error in
+            DispatchQueue.main.async {
+                guard error == nil else { return }
+                self?.username = name
+                self?.isLoggedIn = true
                 self?.completed = ()
             }
-        }.resume()
+        }
     }
-    
+
+    // MARK: - Account Management
+
+    func editUser(nickname: String) {
+        let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
+        changeRequest?.displayName = nickname
+        changeRequest?.commitChanges { [weak self] error in
+            DispatchQueue.main.async {
+                guard error == nil else { return }
+                self?.username = nickname
+            }
+        }
+    }
+
+    func logout() {
+        try? Auth.auth().signOut()
+    }
+
+    func reauthAndDelete(credential: OAuthCredential) {
+        guard let user = Auth.auth().currentUser else { return }
+        user.reauthenticate(with: credential) { _, error in
+            guard error == nil else { return }
+            let userId = user.uid
+            Task {
+                await Self.deleteFirestoreRecords(userId: userId)
+                user.delete { _ in }
+            }
+        }
+    }
+
+    private static func deleteFirestoreRecords(userId: String) async {
+        let ref = Firestore.firestore()
+            .collection("users").document(userId)
+            .collection("records")
+        guard let snapshot = try? await ref.getDocuments() else { return }
+        let batch = Firestore.firestore().batch()
+        snapshot.documents.forEach { batch.deleteDocument($0.reference) }
+        try? await batch.commit()
+    }
+
     func markOnboardingSeenIfNeeded() {
         if !hasSeenOnboarding {
             hasSeenOnboarding = true
             UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+        }
+    }
+
+    // MARK: - Private
+
+    private func handleSignedInUser(_ user: FirebaseAuth.User) {
+        if user.displayName?.isEmpty ?? true {
+            naviToProfileEdit = true
+        } else {
+            username = user.displayName!
+            isLoggedIn = true
         }
     }
 }

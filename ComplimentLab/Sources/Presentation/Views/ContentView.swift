@@ -9,20 +9,22 @@ public struct ContentView: View {
     public var body: some View {
         if isActive {
             ZStack {
-                if loginViewModel.hasToken {
+                if loginViewModel.isLoggedIn {
                     CustomTabView()
                         .onAppear {
                             loginViewModel.markOnboardingSeenIfNeeded()
                         }
                 } else {
-                    if loginViewModel.hasSeenOnboarding {
-                        WelcomeBackView()
-                    } else {
-                        LoginView()
-                    }
+                    LoginView()
+                    
+//                    if loginViewModel.hasSeenOnboarding {
+//                        WelcomeBackView()
+//                    } else {
+//                        LoginView()
+//                    }
                 }
             }
-            .animation(.easeInOut(duration: 0.3), value: loginViewModel.hasToken)
+            .animation(.easeInOut(duration: 0.3), value: loginViewModel.isLoggedIn)
         } else {
             PinkGradientSplashView(isActive: $isActive)
         }
