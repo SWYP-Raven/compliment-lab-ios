@@ -24,7 +24,7 @@ let project = Project(
     targets: [
         .target(
             name: "ComplimentLab",
-            destinations: .iOS,
+            destinations: [.iPhone],
             product: .app,
             bundleId: "com.raven.complimentlab",
             deploymentTargets: .iOS("18.0"),
@@ -123,14 +123,14 @@ let project = Project(
             settings: .settings(
                 base: [
                     "MARKETING_VERSION": "1.0.2",
-                    "CURRENT_PROJECT_VERSION": "1",
+                    "CURRENT_PROJECT_VERSION": "2",
                     "OTHER_LDFLAGS": "$(inherited) -ObjC"
                 ]
             )
         ),
         .target(
             name: "ComplimentLabTests",
-            destinations: .iOS,
+            destinations: [.iPhone],
             product: .unitTests,
             bundleId: "dev.tuist.ComplimentLabTests",
             infoPlist: .default,
