@@ -77,6 +77,7 @@ struct ChatingView: View {
                                     )
                                     .autocorrectionDisabled()
                                     .textInputAutocapitalization(.never)
+                                    .disabled(chatingViewModel.isChatDisabled)
                                 
                                 Button(action: {
                                     chatingViewModel.postChat(message: message, friendId: friend.id)
@@ -86,6 +87,7 @@ struct ChatingView: View {
                                 }
                                 .disabled(
                                     message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                                        || chatingViewModel.isChatDisabled
                                 )
                                 .padding(.trailing, 4)
                             }

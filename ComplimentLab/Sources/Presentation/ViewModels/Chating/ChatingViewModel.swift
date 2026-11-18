@@ -12,6 +12,8 @@ import RxSwift
 final class ChatingViewModel: ObservableObject {
     @Published var chats: [Chat] = []
     @Published var didLoad = false
+    // 대화 기능 준비 중. 안내 응답을 한 번 띄운 뒤로는 입력을 막는다
+    @Published var isChatDisabled = false
     
     @Published var card: Card = Card(id: 0, chatId: 0, type: .energetic, message: "", role: .ASSISTANT, createdAt: Date())
     @Published var cards: [Card] = []
@@ -43,6 +45,7 @@ final class ChatingViewModel: ObservableObject {
             .subscribe(
                 onNext: { [weak self] items in
                     self?.chats = items
+                    self?.isChatDisabled = false
                     self?.didLoad = true
                 },
                 onError: { [weak self] _ in
@@ -62,6 +65,7 @@ final class ChatingViewModel: ObservableObject {
             role: .ASSISTANT
         )
         chats.append(errorChat)
+        isChatDisabled = true
     }
     
     func postCard(createCardDTO: CreateCardDTO) {

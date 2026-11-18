@@ -43,7 +43,7 @@ struct ChatMessageRow: View {
                             )
                         )
                     
-                    if isLast {
+                    if isLast && !chatingViewModel.isChatDisabled {
                         VStack {
                             Spacer()
                             Button {
