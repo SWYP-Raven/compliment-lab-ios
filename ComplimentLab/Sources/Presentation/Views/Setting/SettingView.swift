@@ -58,7 +58,7 @@ struct SettingView: View {
                         Text("앱 버전 정보")
                             .font(.suite(.bold, size: 17))
                             .foregroundStyle(Color.gray8)
-                        Text("V1.0.2")
+                        Text("V\(Bundle.main.appVersion)")
                             .font(.suite(.medium, size: 12))
                             .foregroundStyle(Color.gray6)
                         Spacer()
