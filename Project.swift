@@ -122,8 +122,8 @@ let project = Project(
             ],
             settings: .settings(
                 base: [
-                    "MARKETING_VERSION": "1.0.2",
-                    "CURRENT_PROJECT_VERSION": "2",
+                    "MARKETING_VERSION": "1.0.3",
+                    "CURRENT_PROJECT_VERSION": "1",
                     "OTHER_LDFLAGS": "$(inherited) -ObjC"
                 ]
             )
